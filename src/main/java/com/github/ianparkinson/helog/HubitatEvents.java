@@ -12,7 +12,7 @@ import java.util.concurrent.Callable;
 import static com.github.ianparkinson.helog.Strings.emptyIfNull;
 
 /**
- * Connects to the Events websocket of a Hubitat Evolution, and spools events to stdout.
+ * Connects to the Events websocket of a Hubitat Elevation, and spools events to stdout.
  */
 @Command(
         name = "events",

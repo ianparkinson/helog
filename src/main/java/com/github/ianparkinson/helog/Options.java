@@ -17,7 +17,7 @@ public final class Options {
 
     @Parameters(
             index = "0",
-            description = "IP address or host name of the Hubitat Evolution. May optionally specify a port, with " +
+            description = "IP address or host name of the Hubitat Elevation. May optionally specify a port, with " +
                     "the format @|yellow <host>:<port>|@"
     )
     public void setHost(String host) {

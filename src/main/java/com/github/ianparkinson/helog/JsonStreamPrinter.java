@@ -13,7 +13,7 @@ import java.util.function.Function;
  *
  * <p> Provides the main functionality for {@link HubitatEvents} and {@link HubitatLog}.
  *
- * <p> Most of the time, each event from the Hubitat Evolution is received in a single call to {@link
+ * <p> Most of the time, each event from the Hubitat Elevation is received in a single call to {@link
  * java.net.http.WebSocket.Listener#onText}. However, occasionally an event can be split across multiple calls to
  * {@code onText} - to handle this, {@link WebSocketSource} concatenates all the received text into a single stream and
  * {@link JsonStreamPrinter} takes care of separating out the individual JSON entries.

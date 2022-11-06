@@ -8,7 +8,7 @@ import static picocli.CommandLine.ScopeType.INHERIT;
 
 @CommandLine.Command(
         name = "helog",
-        header = "Writes live logs from a Hubitat Evolution's /logsocket or /eventsocket streams to stdout.",
+        header = "Writes live logs from a Hubitat Elevation's /logsocket or /eventsocket streams to stdout.",
         synopsisHeading = "Usage:%n",
         customSynopsis = {
                 "  @|bold helog log|@ @|yellow <host>|@",
@@ -24,7 +24,7 @@ public final class Helog {
      * appears in the global help options.
      */
     @Option(names = {"-r", "--raw"},
-            description = "Write the stream exactly as received from the Hubitat Evolution.",
+            description = "Write the stream exactly as received from the Hubitat Elevation.",
             scope = INHERIT)
     public boolean raw;
 

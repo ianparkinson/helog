@@ -11,7 +11,7 @@ import java.util.concurrent.Callable;
 import static com.github.ianparkinson.helog.Strings.emptyIfNull;
 
 /**
- * Connects to the Log websocket of a Hubitat Evolution, and spools events to stdout.
+ * Connects to the Log websocket of a Hubitat Elevation, and spools events to stdout.
  */
 @CommandLine.Command(
         name = "log",
