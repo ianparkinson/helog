@@ -39,6 +39,15 @@ application {
     mainClass = 'com.github.ianparkinson.helog.Helog'
 }
 
+jar {
+    manifest {
+        attributes(
+                'Implementation-Title': project.name,
+                'Implementation-Version': project.version,
+        )
+    }
+}
+
 test {
     useJUnitPlatform()
     sourceCompatibility = 11

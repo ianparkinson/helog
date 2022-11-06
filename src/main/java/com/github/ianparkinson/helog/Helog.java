@@ -1,6 +1,7 @@
 package com.github.ianparkinson.helog;
 
 import picocli.CommandLine;
+import picocli.CommandLine.IVersionProvider;
 import picocli.CommandLine.Option;
 
 import static picocli.CommandLine.ScopeType.INHERIT;
@@ -14,8 +15,9 @@ import static picocli.CommandLine.ScopeType.INHERIT;
                 "  @|bold helog events|@ @|yellow <host>|@"
         },
         mixinStandardHelpOptions = true,
-        version = {"helog 1.0.0-SNAPSHOT"},
-        subcommands = {HubitatLog.class, HubitatEvents.class})
+        subcommands = {HubitatLog.class, HubitatEvents.class},
+        versionProvider = Helog.VersionProvider.class
+)
 public final class Helog {
     /**
      * Sets the subcommands to render the stream exactly as received from the Hubitat. Defined here so that it
@@ -32,5 +34,20 @@ public final class Helog {
 
     public static void main(String... args) {
         System.exit(run(args));
+    }
+
+    /**
+     * Creates a version identifier for Picocli, based on information stored in the {@code MANIFEST.MF}.
+     *
+     * <p>The {@code Implementation-Title} and {@code Implementation-Version} properties are populated by
+     * the {@code jar} section of {@code build.gradle}.
+     */
+    public static final class VersionProvider implements IVersionProvider {
+        public String[] getVersion() {
+            Package pack = Helog.class.getPackage();
+            return new String[] {
+                    pack.getImplementationTitle() + " " + pack.getImplementationVersion()
+            };
+        }
     }
 }
