@@ -9,8 +9,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.concurrent.Callable;
 
-import static picocli.CommandLine.ScopeType.INHERIT;
-
 @CommandLine.Command(
         name = "helog",
         header = "Writes live logs from a Hubitat Elevation's /logsocket or /eventsocket streams to stdout.",
@@ -59,8 +57,7 @@ public final class Helog implements Callable<Integer> {
     }
 
     @Option(names = {"-r", "--raw"},
-            description = "Write the stream exactly as received from the Hubitat Elevation.",
-            scope = INHERIT)
+            description = "Write the stream exactly as received from the Hubitat Elevation.")
     public boolean raw;
 
     @Override
