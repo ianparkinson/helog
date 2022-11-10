@@ -12,6 +12,11 @@ public final class FixedContentSource implements Source {
     private final String content;
     private final String error;
 
+    public FixedContentSource(String content) {
+        this.content = content;
+        this.error = null;
+    }
+
     public FixedContentSource(String content, String error) {
         this.content = content;
         this.error = error;

@@ -10,7 +10,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import static com.github.ianparkinson.helog.testing.TestStrings.lines;
 import static com.google.common.truth.Truth.assertThat;
 
-public final class HubitatEventsTest {
+public final class HelogLogTest {
     @RegisterExtension
     private final WebSocketServerExtension webServer = new WebSocketServerExtension();
     @RegisterExtension
@@ -20,39 +20,39 @@ public final class HubitatEventsTest {
 
     @Test
     public void connectsToEventSocket() throws InterruptedException {
-        Helog.run("events", webServer.getHostAndPort());
+        Helog.run("log", webServer.getHostAndPort());
         RecordedRequest request = webServer.takeRequest();
-        assertThat(request.getPath()).isEqualTo("/eventsocket");
+        assertThat(request.getPath()).isEqualTo("/logsocket");
     }
 
     @Test
     public void writesFormattedJson() {
-        webServer.content.add("{ \"source\":\"DEVICE\",\"name\":\"switch\",\"displayName\" : \"Christmas Tree\", " +
-                "\"value\" : \"off\", \"type\" : \"digital\", \"unit\":\"null\",\"deviceId\":34,\"hubId\":0," +
-                "\"installedAppId\":0,\"descriptionText\" : \"null\"}");
-        Helog.run("events", webServer.getHostAndPort());
-        assertThat(out.getContent()).isEqualTo(lines("  34:Christmas Tree switch off  "));
+        webServer.content.add("{\"name\":\"Christmas Tree\",\"msg\":\"setSysinfo: [led:off]\",\"id\":34, " +
+                "\"time\":\"2022-11-05 16:25:52.729\",\"type\":\"dev\",\"level\":\"info\"}");
+        Helog.run("log", webServer.getHostAndPort());
+        assertThat(out.getContent()).isEqualTo(
+                lines("2022-11-05 16:25:52.729  dev  info  34:Christmas Tree  setSysinfo: [led:off]"));
     }
 
     @Test
     public void toleratesSplitJson() {
-        webServer.content.add("{ \"source\":\"DEVICE\",\"name\":\"switch\",\"displayName\" : \"Christmas Tree\", ");
-        webServer.content.add("\"value\" : \"off\", \"type\" : \"digital\", \"unit\":\"null\",\"deviceId\":34,");
-        webServer.content.add("\"hubId\":0,\"installedAppId\":0,\"descriptionText\" : \"null\"}");
-        Helog.run("events", webServer.getHostAndPort());
-        assertThat(out.getContent()).isEqualTo(lines("  34:Christmas Tree switch off  "));
+        webServer.content.add("{\"name\":\"Christmas Tree\",\"msg\":\"setSysinfo: [led:off]\",\"id\":34, ");
+        webServer.content.add("\"time\":\"2022-11-05 16:25:52.729\",\"type\":\"dev\",\"level\":\"info\"}");
+        Helog.run("log", webServer.getHostAndPort());
+        assertThat(out.getContent()).isEqualTo(
+                lines("2022-11-05 16:25:52.729  dev  info  34:Christmas Tree  setSysinfo: [led:off]"));
     }
 
     @Test
     public void rawSpoolsExact() {
         webServer.content.add("abc");
         webServer.content.add("def");
-        Helog.run("events", webServer.getHostAndPort(), "--raw");
+        Helog.run("log", webServer.getHostAndPort(), "--raw");
         assertThat(out.getContent()).isEqualTo("abcdef");
     }
 
     @Test
     public void exitCodeMinus1() {
-        assertThat(Helog.run("events", webServer.getHostAndPort())).isEqualTo(-1);
+        assertThat(Helog.run("log", webServer.getHostAndPort())).isEqualTo(-1);
     }
 }

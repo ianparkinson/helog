@@ -15,11 +15,12 @@ public final class RawPrinterTest {
     @RegisterExtension
     private final StdErrExtension err = new StdErrExtension();
 
+    private final RawPrinter rawPrinter = new RawPrinter();
+
     @Test
     public void spoolsText() {
         String content = "Test Content";
-        RawPrinter printer = new RawPrinter(new FixedContentSource(content, null));
-        printer.run();
+        rawPrinter.run(new FixedContentSource(content));
 
         assertThat(out.getContent()).isEqualTo(content);
     }
@@ -27,8 +28,7 @@ public final class RawPrinterTest {
     @Test
     public void recordsError() {
         String error = "Some error";
-        RawPrinter printer = new RawPrinter(new FixedContentSource("", error));
-        printer.run();
+        rawPrinter.run(new FixedContentSource("", error));
 
         assertThat(err.getContent()).isEqualTo(lines(error));
     }

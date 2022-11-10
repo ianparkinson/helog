@@ -7,13 +7,8 @@ import java.io.Reader;
  * Writes text from a {@link Source} out to stdout.
  */
 public final class RawPrinter {
-    private final Source source;
 
-    public RawPrinter(Source source) {
-        this.source = source;
-    }
-
-    public void run() {
+    public void run(Source source) {
         Source.Connection connection = source.connect();
 
         char[] buffer = new char[1024];
