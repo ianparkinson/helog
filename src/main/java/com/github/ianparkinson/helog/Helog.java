@@ -60,8 +60,18 @@ public final class Helog implements Callable<Integer> {
             description = "Write the stream exactly as received from the Hubitat Elevation.")
     public boolean raw;
 
+    @Option(names = "--kofi",
+            description = "Buy the author a coffee.",
+            help = true)
+    public boolean kofi;
+
     @Override
     public Integer call() throws URISyntaxException {
+        if (kofi) {
+            kofi();
+            return 0;
+        }
+
         URI uri = new URI("ws://" + host + "/" + stream.jsonStream.path());
         WebSocketSource source = new WebSocketSource(uri);
 
@@ -75,6 +85,11 @@ public final class Helog implements Callable<Integer> {
 
     private static <T> JsonStreamPrinter<T> createJsonStreamPrinter(JsonStream<T> jsonStream) {
         return new JsonStreamPrinter<>(jsonStream.type(), jsonStream.formatter());
+    }
+
+    public static void kofi() {
+        System.out.println("Thank you!");
+        System.out.println("https://ko-fi.com/ianparkinson");
     }
 
     public static int run(String... args) {
