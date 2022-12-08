@@ -19,7 +19,7 @@ public final class HelogCommand {
      */
     public static Result run(String... args) throws InterruptedException, IOException {
         ArrayList<String> allArgs = new ArrayList<>();
-        allArgs.add("build/install/helog/bin/helog");
+        allArgs.add(command());
         allArgs.addAll(Arrays.asList(args));
         Process process = Runtime.getRuntime().exec(allArgs.toArray(new String[] {}));
         process.waitFor(1, TimeUnit.SECONDS);
@@ -47,6 +47,14 @@ public final class HelogCommand {
             this.exitCode = exitCode;
             this.stdOut = stdOut;
             this.stdErr = stdErr;
+        }
+    }
+
+    private static String command() {
+        if (System.getProperty("os.name").startsWith("Windows")) {
+            return "build\\install\\helog\\bin\\helog.bat";
+        } else {
+            return "build/install/helog/bin/helog";
         }
     }
 }
