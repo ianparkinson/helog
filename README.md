@@ -1,6 +1,6 @@
 # `helog`
 
-`helog` is a command-line utiltiy which connects to a [Hubitat Elevation](https://hubitat.com/) and writes the event stream, or debug log, to stdout.
+`helog` is a command-line utiltiy which connects to a [Hubitat Elevation](https://hubitat.com/) and writes the live event stream, or debug log, to stdout.
 
 ## Installation
 
