@@ -39,12 +39,12 @@ public class WritesLogsTest {
     @Test
     public void eventCommandFailsAtEndOfStream() throws IOException, InterruptedException {
         HelogCommand.Result result = HelogCommand.run("events", webServer.getHostAndPort());
-        assertThat(result.exitCode).isEqualTo(255);
+        assertThat(result.exitCode).isEqualTo(1);
     }
 
     @Test
     public void logCommandFailsAtEndOfStream() throws IOException, InterruptedException {
         HelogCommand.Result result = HelogCommand.run("log", webServer.getHostAndPort());
-        assertThat(result.exitCode).isEqualTo(255);
+        assertThat(result.exitCode).isEqualTo(1);
     }
 }

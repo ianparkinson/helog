@@ -52,7 +52,7 @@ public final class HelogLogTest {
     }
 
     @Test
-    public void exitCodeMinus1() {
-        assertThat(Helog.run("log", webServer.getHostAndPort())).isEqualTo(-1);
+    public void exitCode1() {
+        assertThat(Helog.run("log", webServer.getHostAndPort())).isEqualTo(1);
     }
 }

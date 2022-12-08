@@ -80,7 +80,7 @@ public final class Helog implements Callable<Integer> {
         } else {
             createJsonStreamPrinter(stream.jsonStream).run(source);
         }
-        return -1;
+        return 1;
     }
 
     private static <T> JsonStreamPrinter<T> createJsonStreamPrinter(JsonStream<T> jsonStream) {
