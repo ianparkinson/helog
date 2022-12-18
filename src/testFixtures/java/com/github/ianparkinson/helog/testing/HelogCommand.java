@@ -22,7 +22,7 @@ public final class HelogCommand {
         allArgs.add(command());
         allArgs.addAll(Arrays.asList(args));
         Process process = Runtime.getRuntime().exec(allArgs.toArray(new String[] {}));
-        process.waitFor(1, TimeUnit.SECONDS);
+        process.waitFor(10, TimeUnit.SECONDS);
 
         return new Result(
                 process.exitValue(),
