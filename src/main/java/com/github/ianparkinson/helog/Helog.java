@@ -11,7 +11,7 @@ import java.util.concurrent.Callable;
 
 @CommandLine.Command(
         name = "helog",
-        header = "Writes live logs from a Hubitat Elevation's /logsocket or /eventsocket streams to stdout.",
+        header = Helog.HEADER,
         synopsisHeading = "Usage:%n",
         customSynopsis = {
                 "  @|bold helog log|@ @|yellow <host>|@",
@@ -21,6 +21,9 @@ import java.util.concurrent.Callable;
         versionProvider = Helog.VersionProvider.class
 )
 public final class Helog implements Callable<Integer> {
+
+    static final String HEADER =
+            "Writes live logs from a Hubitat Elevation's /logsocket or /eventsocket streams to stdout.";
 
     @CommandLine.Spec
     private CommandLine.Model.CommandSpec commandSpec;
@@ -93,7 +96,14 @@ public final class Helog implements Callable<Integer> {
     }
 
     public static int run(String... args) {
-        return new CommandLine(new Helog()).setCaseInsensitiveEnumValuesAllowed(true).execute(args);
+        if (args.length == 0) {
+            // If called without any arguments, Picocli writes an error to stderr before writing usage. Bypass the
+            // error, just print usage.
+            CommandLine.usage(new Helog(), System.err);
+            return 2;
+        } else {
+            return new CommandLine(new Helog()).setCaseInsensitiveEnumValuesAllowed(true).execute(args);
+        }
     }
 
     public static void main(String... args) {
