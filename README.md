@@ -2,7 +2,7 @@
 
 `helog` is a command-line utility which connects to a [Hubitat Elevation](https://hubitat.com/) and writes the live event stream, or debug log, to stdout.
 
-[![Tests](https://github.com/ianparkinson/helog/actions/workflows/check.yml/badge.svg)](https://github.com/ianparkinson/helog/actions/workflows/check.yml)
+[![Tests](https://github.com/ianparkinson/helog/actions/workflows/check.yml/badge.svg)](https://github.com/ianparkinson/helog/actions/workflows/check.yml?event=push)
 
 ## Installation
 
