@@ -7,6 +7,7 @@ import okhttp3.mockwebserver.RecordedRequest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
+import static com.github.ianparkinson.helog.Helog.ERROR_PREFIX;
 import static com.github.ianparkinson.helog.testing.TestStrings.lines;
 import static com.google.common.truth.Truth.assertThat;
 
@@ -49,6 +50,13 @@ public final class HelogEventsTest {
         webServer.content.add("def");
         Helog.run("events", webServer.getHostAndPort(), "--raw");
         assertThat(out.getContent()).isEqualTo("abcdef");
+    }
+
+    @Test
+    public void rawDisallowsDevice() {
+        int code = Helog.run("events", webServer.getHostAndPort(), "--raw", "--device=42");
+        assertThat(err.getContent()).startsWith(ERROR_PREFIX);
+        assertThat(code).isEqualTo(2);
     }
 
     @Test

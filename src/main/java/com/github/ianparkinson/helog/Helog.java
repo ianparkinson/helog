@@ -3,6 +3,7 @@ package com.github.ianparkinson.helog;
 import picocli.CommandLine;
 import picocli.CommandLine.IVersionProvider;
 import picocli.CommandLine.Option;
+import picocli.CommandLine.ParameterException;
 import picocli.CommandLine.Parameters;
 
 import java.net.URI;
@@ -24,6 +25,7 @@ public final class Helog implements Callable<Integer> {
 
     static final String HEADER =
             "Writes live logs from a Hubitat Elevation's /logsocket or /eventsocket streams to stdout.";
+    static final String ERROR_PREFIX = "Error: ";
 
     @CommandLine.Spec
     private CommandLine.Model.CommandSpec commandSpec;
@@ -53,11 +55,16 @@ public final class Helog implements Callable<Integer> {
         if (Strings.isHostPort(host)) {
             this.host = host;
         } else {
-            throw new CommandLine.ParameterException(commandSpec.commandLine(), String.format(
+            throw new ParameterException(commandSpec.commandLine(), String.format(
                     "Invalid value '%s' for host: should be an IP address or hostname, optionally with a port using " +
                             "the format <host>:<port>", host));
         }
     }
+
+    @Option(names = "--device",
+            description = "Writes logs for a specific device, specified using either the full device name or the " +
+                    "numeric id.")
+    public String device;
 
     @Option(names = {"-r", "--raw"},
             description = "Write the stream exactly as received from the Hubitat Elevation.")
@@ -75,6 +82,7 @@ public final class Helog implements Callable<Integer> {
             return 0;
         }
 
+        validateParameters();
         URI uri = new URI("ws://" + host + "/" + stream.jsonStream.path());
         WebSocketSource source = new WebSocketSource(uri);
 
@@ -84,6 +92,16 @@ public final class Helog implements Callable<Integer> {
             createJsonStreamPrinter(stream.jsonStream).run(source);
         }
         return 1;
+    }
+
+    private void validateParameters() throws ParameterException {
+        if (raw && device != null) {
+            throw parameterException("--device cannot be used with --raw");
+        }
+    }
+
+    private ParameterException parameterException(String message) {
+        return new ParameterException(commandSpec.commandLine(), ERROR_PREFIX + message);
     }
 
     private static <T> JsonStreamPrinter<T> createJsonStreamPrinter(JsonStream<T> jsonStream) {
