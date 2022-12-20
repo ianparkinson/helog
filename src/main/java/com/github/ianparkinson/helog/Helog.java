@@ -9,6 +9,7 @@ import picocli.CommandLine.Parameters;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.concurrent.Callable;
+import java.util.function.Predicate;
 
 @CommandLine.Command(
         name = "helog",
@@ -62,8 +63,8 @@ public final class Helog implements Callable<Integer> {
     }
 
     @Option(names = "--device",
-            description = "Writes logs for a specific device, specified using either the full device name or the " +
-                    "numeric id.")
+            description = "Writes logs for a specific device, specified using either the numeric id or the full " +
+                    "device name (case sensitive).")
     public String device;
 
     @Option(names = {"-r", "--raw"},
@@ -104,8 +105,9 @@ public final class Helog implements Callable<Integer> {
         return new ParameterException(commandSpec.commandLine(), ERROR_PREFIX + message);
     }
 
-    private static <T> JsonStreamPrinter<T> createJsonStreamPrinter(JsonStream<T> jsonStream) {
-        return new JsonStreamPrinter<>(jsonStream.type(), jsonStream.formatter());
+    private <T> JsonStreamPrinter<T> createJsonStreamPrinter(JsonStream<T> jsonStream) {
+        Predicate<T> filter = device != null ? jsonStream.device(device) : e -> true;
+        return new JsonStreamPrinter<>(jsonStream.type(), filter, jsonStream.formatter());
     }
 
     public static void kofi() {
@@ -120,7 +122,10 @@ public final class Helog implements Callable<Integer> {
             CommandLine.usage(new Helog(), System.err);
             return 2;
         } else {
-            return new CommandLine(new Helog()).setCaseInsensitiveEnumValuesAllowed(true).execute(args);
+            return new CommandLine(new Helog())
+                    .setCaseInsensitiveEnumValuesAllowed(true)
+                    .setTrimQuotes(true)
+                    .execute(args);
         }
     }
 

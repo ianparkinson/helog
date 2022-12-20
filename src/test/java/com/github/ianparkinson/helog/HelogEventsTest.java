@@ -45,6 +45,33 @@ public final class HelogEventsTest {
     }
 
     @Test
+    public void deviceMatchesName() {
+        webServer.content.add("{ \"source\":\"DEVICE\",\"name\":\"switch\",\"displayName\" : \"Christmas Tree\", " +
+                "\"value\" : \"off\", \"type\" : \"digital\", \"unit\":\"null\",\"deviceId\":34,\"hubId\":0," +
+                "\"installedAppId\":0,\"descriptionText\" : \"null\"}");
+        Helog.run("events", webServer.getHostAndPort(), "--device=\"Christmas Tree\"");
+        assertThat(out.getContent()).isNotEmpty();
+    }
+
+    @Test
+    public void deviceMatchesId() {
+        webServer.content.add("{ \"source\":\"DEVICE\",\"name\":\"switch\",\"displayName\" : \"Christmas Tree\", " +
+                "\"value\" : \"off\", \"type\" : \"digital\", \"unit\":\"null\",\"deviceId\":34,\"hubId\":0," +
+                "\"installedAppId\":0,\"descriptionText\" : \"null\"}");
+        Helog.run("events", webServer.getHostAndPort(), "--device=34");
+        assertThat(out.getContent()).isNotEmpty();
+    }
+
+    @Test
+    public void deviceMatchesNeitherNameNorId() {
+        webServer.content.add("{ \"source\":\"DEVICE\",\"name\":\"switch\",\"displayName\" : \"Christmas Tree\", " +
+                "\"value\" : \"off\", \"type\" : \"digital\", \"unit\":\"null\",\"deviceId\":34,\"hubId\":0," +
+                "\"installedAppId\":0,\"descriptionText\" : \"null\"}");
+        Helog.run("events", webServer.getHostAndPort(), "--device=23");
+        assertThat(out.getContent()).isEmpty();
+    }
+
+    @Test
     public void rawSpoolsExact() {
         webServer.content.add("abc");
         webServer.content.add("def");

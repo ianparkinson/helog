@@ -45,6 +45,30 @@ public final class HelogLogTest {
     }
 
     @Test
+    public void deviceMatchesName() {
+        webServer.content.add("{\"name\":\"Christmas Tree\",\"msg\":\"setSysinfo: [led:off]\",\"id\":34, " +
+                "\"time\":\"2022-11-05 16:25:52.729\",\"type\":\"dev\",\"level\":\"info\"}");
+        Helog.run("log", webServer.getHostAndPort(), "--device=\"Christmas Tree\"");
+        assertThat(out.getContent()).isNotEmpty();
+    }
+
+    @Test
+    public void deviceMatchesId() {
+        webServer.content.add("{\"name\":\"Christmas Tree\",\"msg\":\"setSysinfo: [led:off]\",\"id\":34, " +
+                "\"time\":\"2022-11-05 16:25:52.729\",\"type\":\"dev\",\"level\":\"info\"}");
+        Helog.run("log", webServer.getHostAndPort(), "--device=34");
+        assertThat(out.getContent()).isNotEmpty();
+    }
+
+    @Test
+    public void deviceMatchesNeitherNameNorId() {
+        webServer.content.add("{\"name\":\"Christmas Tree\",\"msg\":\"setSysinfo: [led:off]\",\"id\":34, " +
+                "\"time\":\"2022-11-05 16:25:52.729\",\"type\":\"dev\",\"level\":\"info\"}");
+        Helog.run("log", webServer.getHostAndPort(), "--device=23");
+        assertThat(out.getContent()).isEmpty();
+    }
+
+    @Test
     public void rawSpoolsExact() {
         webServer.content.add("abc");
         webServer.content.add("def");

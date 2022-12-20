@@ -10,6 +10,30 @@ class LogJsonStreamTest {
     private final LogJsonStream logJsonStream = new LogJsonStream();
 
     @Test
+    void device_numericIdMatches() {
+        LogEntry entry = new LogEntry();
+        entry.name = "n";
+        entry.id = "42";
+        assertThat(logJsonStream.device("42").test(entry)).isTrue();
+    }
+
+    @Test
+    void device_nameMatches() {
+        LogEntry entry = new LogEntry();
+        entry.name = "n";
+        entry.id = "42";
+        assertThat(logJsonStream.device("n").test(entry)).isTrue();
+    }
+
+    @Test
+    void device_noMatch() {
+        LogEntry entry = new LogEntry();
+        entry.name = "n";
+        entry.id = "42";
+        assertThat(logJsonStream.device("23").test(entry)).isFalse();
+    }
+
+    @Test
     void formatter() {
         LogEntry entry = new LogEntry();
         entry.name = "n";

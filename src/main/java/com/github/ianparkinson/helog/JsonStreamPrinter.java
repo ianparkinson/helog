@@ -6,6 +6,7 @@ import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 /**
  * Reads a stream of events in JSON format, and writes them to stdout in a human-readable format.
@@ -24,17 +25,21 @@ public final class JsonStreamPrinter<T> {
     public static final Gson gson = new Gson();
 
     private final TypeToken<T> jsonTypeToken;
+    private final Predicate<T> filter;
     private final Function<T, String> formatter;
 
     /**
      * @param jsonTypeToken Token for the type used to represent entries in the JSON stream. Passed to Gson to parse
      *                      the streamed JSON.
+     * @param filter        Predicate selecting which entries to log.
      * @param formatter     Transforms the result of parsing JSON to a human-readable String.
      */
     public JsonStreamPrinter(
             TypeToken<T> jsonTypeToken,
+            Predicate<T> filter,
             Function<T, String> formatter) {
         this.jsonTypeToken = jsonTypeToken;
+        this.filter = filter;
         this.formatter = formatter;
     }
 
@@ -52,7 +57,9 @@ public final class JsonStreamPrinter<T> {
             try {
                 T entry = gson.fromJson(jsonReader, jsonTypeToken);
                 if (entry != null) {
-                    System.out.println(formatter.apply(entry));
+                    if (filter.test(entry)) {
+                        System.out.println(formatter.apply(entry));
+                    }
                 } else if (connection.getError() != null) {
                     System.err.println(connection.getError());
                     return;

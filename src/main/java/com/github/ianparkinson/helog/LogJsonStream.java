@@ -2,7 +2,9 @@ package com.github.ianparkinson.helog;
 
 import com.google.gson.reflect.TypeToken;
 
+import java.util.Objects;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 import static com.github.ianparkinson.helog.Strings.emptyIfNull;
 
@@ -19,6 +21,11 @@ public final class LogJsonStream implements JsonStream<LogJsonStream.LogEntry> {
     @Override
     public TypeToken<LogEntry> type() {
         return TypeToken.get(LogEntry.class);
+    }
+
+    @Override
+    public Predicate<LogEntry> device(String device) {
+        return entry -> Objects.equals(entry.id, device) || Objects.equals(entry.name, device);
     }
 
     @Override

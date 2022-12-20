@@ -7,6 +7,8 @@ import com.google.gson.reflect.TypeToken;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
+import java.util.function.Predicate;
+
 import static com.github.ianparkinson.helog.testing.TestStrings.lines;
 import static com.google.common.truth.Truth.assertThat;
 
@@ -16,14 +18,10 @@ public final class JsonStreamPrinterTest {
     @RegisterExtension
     private final StdErrExtension err = new StdErrExtension();
 
-    private final JsonStreamPrinter<TestEntry> jsonStreamPrinter = new JsonStreamPrinter<>(
-            TypeToken.get(TestEntry.class),
-            TestEntry::format);
-
     @Test
     public void formatsEntry() {
         String content = "{\"name\": \"foo\", \"value\": 42}";
-        jsonStreamPrinter.run(new FixedContentSource(content));
+        jsonStreamPrinter().run(new FixedContentSource(content));
 
         assertThat(out.getContent()).isEqualTo(lines("foo 42"));
     }
@@ -31,23 +29,33 @@ public final class JsonStreamPrinterTest {
     @Test
     public void formatsMultipleEntries() {
         String content = "{\"name\": \"foo\", \"value\": 42}{\"name\": \"bar\", \"value\": 23}";
-        jsonStreamPrinter.run(new FixedContentSource(content));
+        jsonStreamPrinter().run(new FixedContentSource(content));
 
         assertThat(out.getContent()).isEqualTo(lines("foo 42", "bar 23"));
     }
 
     @Test
     public void formatsNoEntries() {
-        jsonStreamPrinter.run(new FixedContentSource(""));
+        jsonStreamPrinter().run(new FixedContentSource(""));
 
         assertThat(out.getContent()).isEmpty();
+    }
+
+    @Test
+    public void appliesFilter() {
+        String content = "{\"name\": \"foo\", \"value\": 42}"
+                + "{\"name\": \"bar\", \"value\": 23}"
+                + "{\"name\": \"baz\", \"value\": 42}";
+        jsonStreamPrinter(e -> e.value == 42).run(new FixedContentSource(content));
+
+        assertThat(out.getContent()).isEqualTo(lines("foo 42", "baz 42"));
     }
 
     @Test
     public void recordsError() {
         String content = "{\"name\": \"foo\", \"value\": 42}";
         String error = "End";
-        jsonStreamPrinter.run(new FixedContentSource(content, error));
+        jsonStreamPrinter().run(new FixedContentSource(content, error));
 
         assertThat(err.getContent()).isEqualTo(lines(error));
     }
@@ -57,10 +65,21 @@ public final class JsonStreamPrinterTest {
         String content = "{\"name\": \"foo\", \"value\": 42}" +
                         "BAD" +
                         "{\"name\": \"foo\", \"value\": 42}";
-        jsonStreamPrinter.run(new FixedContentSource(content));
+        jsonStreamPrinter().run(new FixedContentSource(content));
 
         assertThat(out.getContent()).isEqualTo(lines("foo 42"));
         assertThat(err.getContent()).startsWith("Malformed JSON");
+    }
+
+    private static JsonStreamPrinter<TestEntry> jsonStreamPrinter(Predicate<TestEntry> filter) {
+        return new JsonStreamPrinter<>(
+                TypeToken.get(TestEntry.class),
+                filter,
+                TestEntry::format);
+    }
+
+    private static JsonStreamPrinter<TestEntry> jsonStreamPrinter() {
+        return jsonStreamPrinter(e -> true);
     }
 
     private static class TestEntry {
