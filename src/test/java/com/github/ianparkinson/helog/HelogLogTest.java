@@ -9,6 +9,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 
 import static com.github.ianparkinson.helog.Helog.ERROR_PREFIX;
 import static com.github.ianparkinson.helog.testing.TestStrings.lines;
+import static com.github.ianparkinson.helog.testing.TestStrings.splitLines;
 import static com.google.common.truth.Truth.assertThat;
 
 public final class HelogLogTest {
@@ -20,10 +21,17 @@ public final class HelogLogTest {
     private final StdErrExtension err = new StdErrExtension();
 
     @Test
-    public void connectsToEventSocket() throws InterruptedException {
+    public void connectsToLogSocket() throws InterruptedException {
         Helog.run("log", webServer.getHostAndPort());
         RecordedRequest request = webServer.takeRequest();
         assertThat(request.getPath()).isEqualTo("/logsocket");
+    }
+
+    @Test
+    public void reportsConnection() {
+        Helog.run("log", webServer.getHostAndPort());
+        assertThat(splitLines(err.getContent())[0]).isEqualTo(
+                "Connected to ws://" + webServer.getHostAndPort() + "/logsocket");
     }
 
     @Test

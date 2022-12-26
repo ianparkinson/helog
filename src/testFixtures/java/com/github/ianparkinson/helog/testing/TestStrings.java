@@ -15,4 +15,11 @@ public final class TestStrings {
         }
         return builder.toString();
     }
+
+    /**
+     * Splits a String into lines, using any Unicode line separator.
+     */
+    public static String[] splitLines(String string) {
+        return string.split("\\R");
+    }
 }

@@ -25,6 +25,12 @@ public final class WebSocketSource implements Source {
 
         HttpClient.newHttpClient().newWebSocketBuilder().buildAsync(uri, new WebSocket.Listener() {
             @Override
+            public void onOpen(WebSocket webSocket) {
+                System.err.println("Connected to " + uri);
+                WebSocket.Listener.super.onOpen(webSocket);
+            }
+
+            @Override
             public CompletionStage<?> onText(WebSocket webSocket, CharSequence data, boolean last) {
                 try {
                     connection.writer.append(data);
