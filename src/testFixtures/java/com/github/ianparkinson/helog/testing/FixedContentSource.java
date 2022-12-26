@@ -1,5 +1,6 @@
 package com.github.ianparkinson.helog.testing;
 
+import com.github.ianparkinson.helog.ErrorMessage;
 import com.github.ianparkinson.helog.Source;
 
 import java.io.Reader;
@@ -10,14 +11,14 @@ import java.io.StringReader;
  */
 public final class FixedContentSource implements Source {
     private final String content;
-    private final String error;
+    private final ErrorMessage error;
 
     public FixedContentSource(String content) {
         this.content = content;
         this.error = null;
     }
 
-    public FixedContentSource(String content, String error) {
+    public FixedContentSource(String content, ErrorMessage error) {
         this.content = content;
         this.error = error;
     }
@@ -29,9 +30,9 @@ public final class FixedContentSource implements Source {
 
     private static class Connection implements Source.Connection {
         private final Reader reader;
-        private final String error;
+        private final ErrorMessage error;
 
-        private Connection(Reader reader, String error) {
+        private Connection(Reader reader, ErrorMessage error) {
             this.reader = reader;
             this.error = error;
         }
@@ -42,7 +43,7 @@ public final class FixedContentSource implements Source {
         }
 
         @Override
-        public String getError() {
+        public ErrorMessage getError() {
             return error;
         }
     }

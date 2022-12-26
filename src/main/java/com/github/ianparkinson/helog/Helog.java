@@ -1,6 +1,7 @@
 package com.github.ianparkinson.helog;
 
 import picocli.CommandLine;
+import picocli.CommandLine.Help.Ansi;
 import picocli.CommandLine.IVersionProvider;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.ParameterException;
@@ -85,10 +86,10 @@ public final class Helog implements Callable<Integer> {
 
         validateParameters();
         URI uri = new URI("ws://" + host + "/" + stream.jsonStream.path());
-        WebSocketSource source = new WebSocketSource(uri);
+        WebSocketSource source = new WebSocketSource(Ansi.AUTO, uri);
 
         if (raw) {
-            new RawPrinter().run(source);
+            new RawPrinter(Ansi.AUTO).run(source);
         } else {
             createJsonStreamPrinter(stream.jsonStream).run(source);
         }
@@ -107,7 +108,7 @@ public final class Helog implements Callable<Integer> {
 
     private <T> JsonStreamPrinter<T> createJsonStreamPrinter(JsonStream<T> jsonStream) {
         Predicate<T> filter = device != null ? jsonStream.device(device) : e -> true;
-        return new JsonStreamPrinter<>(jsonStream.type(), filter, jsonStream.formatter());
+        return new JsonStreamPrinter<>(Ansi.AUTO, jsonStream.type(), filter, jsonStream.formatter());
     }
 
     public static void kofi() {

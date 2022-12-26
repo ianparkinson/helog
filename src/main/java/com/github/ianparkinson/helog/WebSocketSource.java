@@ -1,5 +1,7 @@
 package com.github.ianparkinson.helog;
 
+import picocli.CommandLine.Help.Ansi;
+
 import java.io.IOException;
 import java.io.PipedReader;
 import java.io.PipedWriter;
@@ -9,13 +11,18 @@ import java.net.http.HttpClient;
 import java.net.http.WebSocket;
 import java.util.concurrent.CompletionStage;
 
+import static com.github.ianparkinson.helog.ErrorMessage.errorMessage;
+
 /**
  * Connects to a WebSocket and spools the received text via a {@link PipedReader}.
  */
 public final class WebSocketSource implements Source {
+    private final Ansi ansi;
+
     private final URI uri;
 
-    public WebSocketSource(URI uri) {
+    public WebSocketSource(Ansi ansi, URI uri) {
+        this.ansi = ansi;
         this.uri = uri;
     }
 
@@ -26,7 +33,7 @@ public final class WebSocketSource implements Source {
         HttpClient.newHttpClient().newWebSocketBuilder().buildAsync(uri, new WebSocket.Listener() {
             @Override
             public void onOpen(WebSocket webSocket) {
-                System.err.println("Connected to " + uri);
+                System.err.printf(ansi.string("@|blue Connected to %s|@%n"), uri);
                 WebSocket.Listener.super.onOpen(webSocket);
             }
 
@@ -43,17 +50,17 @@ public final class WebSocketSource implements Source {
 
             @Override
             public CompletionStage<?> onClose(WebSocket webSocket, int statusCode, String reason) {
-                connection.closeOnError(String.format("WebSocket closed: %d \"%s\"%n", statusCode, reason));
+                connection.closeOnError("WebSocket closed", "%d %s", statusCode, reason);
                 return WebSocket.Listener.super.onClose(webSocket, statusCode, reason);
             }
 
             @Override
             public void onError(WebSocket webSocket, Throwable error) {
-                connection.closeOnError(String.format("WebSocket reported error: \"%s\"", error.getMessage()));
+                connection.closeOnError("WebSocket reported error", "%s", error.getMessage());
                 WebSocket.Listener.super.onError(webSocket, error);
             }
         }).exceptionally(throwable -> {
-            connection.closeOnError(String.format("Failed to connect: \"%s\"", throwable.getMessage()));
+            connection.closeOnError("Failed to connect", "%s", throwable.getMessage());
             return null;
         });
 
@@ -63,7 +70,7 @@ public final class WebSocketSource implements Source {
     public static class WebSocketConnection implements Connection {
         private final PipedReader reader;
         private final PipedWriter writer;
-        private volatile String error = null;
+        private volatile ErrorMessage error = null;
 
         private WebSocketConnection() {
             reader = new PipedReader(1024);
@@ -82,12 +89,12 @@ public final class WebSocketSource implements Source {
         }
 
         @Override
-        public String getError() {
+        public ErrorMessage getError() {
             return error;
         }
 
-        private void closeOnError(String error) {
-            this.error = error;
+        private void closeOnError(String message, String detailFormat, Object... detailArgs) {
+            this.error = errorMessage(message, detailFormat, detailArgs);
             try {
                 writer.close();
             } catch (IOException e) {

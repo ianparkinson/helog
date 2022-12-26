@@ -6,9 +6,11 @@ import com.github.ianparkinson.helog.testing.StdOutExtension;
 import com.google.gson.reflect.TypeToken;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import picocli.CommandLine.Help.Ansi;
 
 import java.util.function.Predicate;
 
+import static com.github.ianparkinson.helog.ErrorMessage.errorMessage;
 import static com.github.ianparkinson.helog.testing.TestStrings.lines;
 import static com.google.common.truth.Truth.assertThat;
 
@@ -55,7 +57,7 @@ public final class JsonStreamPrinterTest {
     public void recordsError() {
         String content = "{\"name\": \"foo\", \"value\": 42}";
         String error = "End";
-        jsonStreamPrinter().run(new FixedContentSource(content, error));
+        jsonStreamPrinter().run(new FixedContentSource(content, errorMessage(error)));
 
         assertThat(err.getContent()).isEqualTo(lines(error));
     }
@@ -73,9 +75,7 @@ public final class JsonStreamPrinterTest {
 
     private static JsonStreamPrinter<TestEntry> jsonStreamPrinter(Predicate<TestEntry> filter) {
         return new JsonStreamPrinter<>(
-                TypeToken.get(TestEntry.class),
-                filter,
-                TestEntry::format);
+                Ansi.OFF, TypeToken.get(TestEntry.class), filter, TestEntry::format);
     }
 
     private static JsonStreamPrinter<TestEntry> jsonStreamPrinter() {

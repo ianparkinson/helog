@@ -1,12 +1,22 @@
 package com.github.ianparkinson.helog;
 
+import picocli.CommandLine.Help.Ansi;
+
 import java.io.IOException;
 import java.io.Reader;
+
+import static com.github.ianparkinson.helog.ErrorMessage.errorMessage;
 
 /**
  * Writes text from a {@link Source} out to stdout.
  */
 public final class RawPrinter {
+
+    private final Ansi ansi;
+
+    public RawPrinter(Ansi ansi) {
+        this.ansi = ansi;
+    }
 
     public void run(Source source) {
         Source.Connection connection = source.connect();
@@ -19,9 +29,9 @@ public final class RawPrinter {
                     System.out.print(new String(buffer, 0, count));
                 } else {
                     if (connection.getError() != null) {
-                        System.err.println(connection.getError());
+                        connection.getError().writeToStderr(ansi);
                     } else {
-                        System.err.println("Stream closed");
+                        errorMessage("Stream closed").writeToStderr(ansi);
                     }
                     return;
                 }

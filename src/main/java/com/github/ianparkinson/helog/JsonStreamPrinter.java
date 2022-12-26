@@ -4,9 +4,12 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
+import picocli.CommandLine.Help.Ansi;
 
 import java.util.function.Function;
 import java.util.function.Predicate;
+
+import static com.github.ianparkinson.helog.ErrorMessage.errorMessage;
 
 /**
  * Reads a stream of events in JSON format, and writes them to stdout in a human-readable format.
@@ -24,20 +27,24 @@ import java.util.function.Predicate;
 public final class JsonStreamPrinter<T> {
     public static final Gson gson = new Gson();
 
+    private final Ansi ansi;
     private final TypeToken<T> jsonTypeToken;
     private final Predicate<T> filter;
     private final Function<T, String> formatter;
 
     /**
+     * @param ansi          Colorizes output.
      * @param jsonTypeToken Token for the type used to represent entries in the JSON stream. Passed to Gson to parse
      *                      the streamed JSON.
      * @param filter        Predicate selecting which entries to log.
      * @param formatter     Transforms the result of parsing JSON to a human-readable String.
      */
     public JsonStreamPrinter(
+            Ansi ansi,
             TypeToken<T> jsonTypeToken,
             Predicate<T> filter,
             Function<T, String> formatter) {
+        this.ansi = ansi;
         this.jsonTypeToken = jsonTypeToken;
         this.filter = filter;
         this.formatter = formatter;
@@ -61,17 +68,17 @@ public final class JsonStreamPrinter<T> {
                         System.out.println(formatter.apply(entry));
                     }
                 } else if (connection.getError() != null) {
-                    System.err.println(connection.getError());
+                    connection.getError().writeToStderr(ansi);
                     return;
                 } else {
-                    System.err.println("Stream closed");
+                    errorMessage("Stream closed").writeToStderr(ansi);
                     return;
                 }
             } catch (JsonSyntaxException e) {
                 if (connection.getError() != null) {
-                    System.err.println(connection.getError());
+                    connection.getError().writeToStderr(ansi);
                 } else {
-                    System.err.printf("Malformed JSON: %s%n", e.getMessage());
+                    errorMessage("Malformed JSON", "%s", e.getMessage()).writeToStderr(ansi);
                 }
                 return;
             }

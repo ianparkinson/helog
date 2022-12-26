@@ -5,7 +5,9 @@ import com.github.ianparkinson.helog.testing.StdErrExtension;
 import com.github.ianparkinson.helog.testing.StdOutExtension;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import picocli.CommandLine.Help.Ansi;
 
+import static com.github.ianparkinson.helog.ErrorMessage.errorMessage;
 import static com.github.ianparkinson.helog.testing.TestStrings.lines;
 import static com.google.common.truth.Truth.assertThat;
 
@@ -15,7 +17,7 @@ public final class RawPrinterTest {
     @RegisterExtension
     private final StdErrExtension err = new StdErrExtension();
 
-    private final RawPrinter rawPrinter = new RawPrinter();
+    private final RawPrinter rawPrinter = new RawPrinter(Ansi.OFF);
 
     @Test
     public void spoolsText() {
@@ -28,7 +30,7 @@ public final class RawPrinterTest {
     @Test
     public void recordsError() {
         String error = "Some error";
-        rawPrinter.run(new FixedContentSource("", error));
+        rawPrinter.run(new FixedContentSource("", errorMessage(error)));
 
         assertThat(err.getContent()).isEqualTo(lines(error));
     }

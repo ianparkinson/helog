@@ -21,9 +21,9 @@ public interface Source {
         Reader getReader();
 
         /**
-         * A human-readable string describing the reason why the {@link Reader} has closed. {@code null} if not
+         * A human-readable message describing the reason why the {@link Reader} has closed. {@code null} if not
          * available.
          */
-        String getError();
+        ErrorMessage getError();
     }
 }
