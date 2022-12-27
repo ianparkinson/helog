@@ -1,5 +1,6 @@
 package com.github.ianparkinson.helog;
 
+import com.github.ianparkinson.helog.testing.FailedConnectionSource;
 import com.github.ianparkinson.helog.testing.FixedContentSource;
 import com.github.ianparkinson.helog.testing.StdErrExtension;
 import com.github.ianparkinson.helog.testing.StdOutExtension;
@@ -74,11 +75,26 @@ public final class JsonStreamPrinterTest {
     }
 
     @Test
+    public void reportsConnectionFailed() {
+        String error = "failed";
+        jsonStreamPrinter().run(new FailedConnectionSource(errorMessage(error)));
+        assertThat(err.getContent()).isEqualTo(lines(error));
+    }
+
+    @Test
     public void printsHeader() {
         String header = "Header";
         String content = "{\"name\": \"foo\", \"value\": 42}";
         jsonStreamPrinter(header).run(new FixedContentSource(content));
         assertThat(out.getContent()).isEqualTo(lines(header, "foo 42"));
+    }
+
+    @Test
+    public void omitsHeaderIfConnectionFailed() {
+        String error = "failed";
+        String header = "Header";
+        jsonStreamPrinter(header).run(new FailedConnectionSource(errorMessage(error)));
+        assertThat(err.getContent()).isEqualTo(lines(error));
     }
 
     private static JsonStreamPrinter<TestEntry> jsonStreamPrinter(String header, Predicate<TestEntry> filter) {

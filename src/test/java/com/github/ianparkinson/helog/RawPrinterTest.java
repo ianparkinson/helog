@@ -1,5 +1,6 @@
 package com.github.ianparkinson.helog;
 
+import com.github.ianparkinson.helog.testing.FailedConnectionSource;
 import com.github.ianparkinson.helog.testing.FixedContentSource;
 import com.github.ianparkinson.helog.testing.StdErrExtension;
 import com.github.ianparkinson.helog.testing.StdOutExtension;
@@ -32,6 +33,13 @@ public final class RawPrinterTest {
         String error = "Some error";
         rawPrinter.run(new FixedContentSource("", errorMessage(error)));
 
+        assertThat(err.getContent()).isEqualTo(lines(error));
+    }
+
+    @Test
+    public void reportsConnectionFailed() {
+        String error = "failed";
+        rawPrinter.run(new FailedConnectionSource(errorMessage(error)));
         assertThat(err.getContent()).isEqualTo(lines(error));
     }
 }

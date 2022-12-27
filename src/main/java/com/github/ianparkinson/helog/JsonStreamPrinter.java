@@ -1,5 +1,6 @@
 package com.github.ianparkinson.helog;
 
+import com.github.ianparkinson.helog.Source.ConnectionFailedException;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
@@ -61,7 +62,17 @@ public final class JsonStreamPrinter<T> {
      * error.
      */
     public void run(Source source) {
-        Source.Connection connection = source.connect();
+        Source.Connection connection;
+        try {
+            connection = source.connect();
+        } catch (InterruptedException e) {
+            // Nothing should interrupt us, so treat this as unexpected.
+            throw new RuntimeException("Unexpected interrupt", e);
+        } catch (ConnectionFailedException e) {
+            e.errorMessage.writeToStderr(ansi);
+            return;
+        }
+
         if (header != null) {
             System.out.println(header);
         }

@@ -1,5 +1,6 @@
 package com.github.ianparkinson.helog;
 
+import com.github.ianparkinson.helog.Source.ConnectionFailedException;
 import picocli.CommandLine.Help.Ansi;
 
 import java.io.IOException;
@@ -19,7 +20,16 @@ public final class RawPrinter {
     }
 
     public void run(Source source) {
-        Source.Connection connection = source.connect();
+        Source.Connection connection;
+        try {
+            connection = source.connect();
+        } catch (InterruptedException e) {
+            // Nothing should interrupt us, so treat this as unexpected.
+            throw new RuntimeException("Unexpected interrupt", e);
+        } catch (ConnectionFailedException e) {
+            e.errorMessage.writeToStderr(ansi);
+            return;
+        }
 
         char[] buffer = new char[1024];
         try (Reader reader = connection.getReader()) {

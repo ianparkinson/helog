@@ -7,9 +7,9 @@ import java.io.Reader;
  */
 public interface Source {
     /**
-     * Connect to the source.
+     * Connect to the source. Blocks until the connection is established.
      */
-    Connection connect();
+    Connection connect() throws ConnectionFailedException, InterruptedException;
 
     interface Connection {
         /**
@@ -25,5 +25,19 @@ public interface Source {
          * available.
          */
         ErrorMessage getError();
+    }
+
+    final class ConnectionFailedException extends Exception {
+        public final ErrorMessage errorMessage;
+
+        public ConnectionFailedException(ErrorMessage message) {
+            super(message.toString());
+            errorMessage = message;
+        }
+
+        public ConnectionFailedException(ErrorMessage message, Throwable cause) {
+            super(message.toString(), cause);
+            errorMessage = message;
+        }
     }
 }

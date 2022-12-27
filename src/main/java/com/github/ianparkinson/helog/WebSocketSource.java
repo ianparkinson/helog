@@ -9,7 +9,10 @@ import java.io.Reader;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.WebSocket;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletionStage;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 import static com.github.ianparkinson.helog.ErrorMessage.errorMessage;
 
@@ -27,16 +30,10 @@ public final class WebSocketSource implements Source {
     }
 
     @Override
-    public Connection connect() {
+    public Connection connect() throws ConnectionFailedException, InterruptedException {
         WebSocketConnection connection = new WebSocketConnection();
-
-        HttpClient.newHttpClient().newWebSocketBuilder().buildAsync(uri, new WebSocket.Listener() {
-            @Override
-            public void onOpen(WebSocket webSocket) {
-                System.err.printf(ansi.string("@|blue Connected to %s|@%n"), uri);
-                WebSocket.Listener.super.onOpen(webSocket);
-            }
-
+        HttpClient client = HttpClient.newHttpClient();
+        Future<WebSocket> futureSocket = client.newWebSocketBuilder().buildAsync(uri, new WebSocket.Listener() {
             @Override
             public CompletionStage<?> onText(WebSocket webSocket, CharSequence data, boolean last) {
                 try {
@@ -59,12 +56,22 @@ public final class WebSocketSource implements Source {
                 connection.closeOnError("WebSocket reported error", "%s", error.getMessage());
                 WebSocket.Listener.super.onError(webSocket, error);
             }
-        }).exceptionally(throwable -> {
-            connection.closeOnError("Failed to connect", "%s", throwable.getMessage());
-            return null;
         });
 
-        return connection;
+        try {
+            futureSocket.get();
+            System.err.printf(ansi.string("@|blue Connected to %s|@%n"), uri);
+            return connection;
+        } catch (ExecutionException e) {
+            Throwable cause = e.getCause();
+            ErrorMessage message = (cause != null
+                    ? ErrorMessage.errorMessage("Failed to connect", "%s", cause.getMessage())
+                    : ErrorMessage.errorMessage("Failed to connect"));
+            throw new ConnectionFailedException(message, cause);
+        } catch (CancellationException e) {
+            // Nobody should be cancelling this future
+            throw new RuntimeException("Unexpected cancellation", e);
+        }
     }
 
     public static class WebSocketConnection implements Connection {
