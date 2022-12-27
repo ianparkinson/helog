@@ -77,6 +77,16 @@ public final class HelogLogTest {
     }
 
     @Test
+    public void writesInCsvFormat() {
+        webServer.content.add("{\"name\":\"Christmas Tree\",\"msg\":\"setSysinfo: [led:off]\",\"id\":34, " +
+                "\"time\":\"2022-11-05 16:25:52.729\",\"type\":\"dev\",\"level\":\"info\"}");
+        Helog.run("log", webServer.getHostAndPort(), "--csv");
+        assertThat(out.getContent()).isEqualTo(lines(
+                "name,msg,id,time,type,level",
+                "Christmas Tree,setSysinfo: [led:off],34,2022-11-05 16:25:52.729,dev,info"));
+    }
+
+    @Test
     public void rawSpoolsExact() {
         webServer.content.add("abc");
         webServer.content.add("def");
@@ -87,6 +97,13 @@ public final class HelogLogTest {
     @Test
     public void rawDisallowsDevice() {
         int code = Helog.run("events", webServer.getHostAndPort(), "--raw", "--device=42");
+        assertThat(err.getContent()).startsWith(ERROR_PREFIX);
+        assertThat(code).isEqualTo(2);
+    }
+
+    @Test
+    public void rawAndCsvMutuallyExclusive() {
+        int code = Helog.run("events", webServer.getHostAndPort(), "--raw", "--csv");
         assertThat(err.getContent()).startsWith(ERROR_PREFIX);
         assertThat(code).isEqualTo(2);
     }

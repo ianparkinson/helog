@@ -80,6 +80,17 @@ public final class HelogEventsTest {
     }
 
     @Test
+    public void writesInCsvFormat() {
+        webServer.content.add("{ \"source\":\"DEVICE\",\"name\":\"switch\",\"displayName\" : \"Christmas Tree\", " +
+                "\"value\" : \"off\", \"type\" : \"digital\", \"unit\":\"null\",\"deviceId\":34,\"hubId\":0," +
+                "\"installedAppId\":0,\"descriptionText\" : \"null\"}");
+        Helog.run("events", webServer.getHostAndPort(), "--csv");
+        assertThat(out.getContent()).isEqualTo(lines(
+                "source,name,displayName,value,type,unit,deviceId,hubId,installedAppId,descriptionText",
+                "DEVICE,switch,Christmas Tree,off,digital,,34,0,0,"));
+    }
+
+    @Test
     public void rawSpoolsExact() {
         webServer.content.add("abc");
         webServer.content.add("def");
@@ -90,6 +101,13 @@ public final class HelogEventsTest {
     @Test
     public void rawDisallowsDevice() {
         int code = Helog.run("events", webServer.getHostAndPort(), "--raw", "--device=42");
+        assertThat(err.getContent()).startsWith(ERROR_PREFIX);
+        assertThat(code).isEqualTo(2);
+    }
+
+    @Test
+    public void rawAndCsvMutuallyExclusive() {
+        int code = Helog.run("events", webServer.getHostAndPort(), "--raw", "--csv");
         assertThat(err.getContent()).startsWith(ERROR_PREFIX);
         assertThat(code).isEqualTo(2);
     }

@@ -45,4 +45,18 @@ class LogJsonStreamTest {
 
         assertThat(logJsonStream.formatter().apply(entry)).isEqualTo("ti  ty  l     i:n  m");
     }
+
+    @Test
+    void csvFormatter() {
+        LogEntry entry = new LogEntry();
+        entry.name = "n";
+        entry.msg = "m";
+        entry.id = "i";
+        entry.time = "ti";
+        entry.type = "ty";
+        entry.level = "l";
+
+        assertThat(logJsonStream.csvFormatter().apply(entry))
+                .containsExactly("n", "m", "i", "ti", "ty", "l").inOrder();
+    }
 }

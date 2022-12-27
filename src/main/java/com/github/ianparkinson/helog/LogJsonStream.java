@@ -2,11 +2,13 @@ package com.github.ianparkinson.helog;
 
 import com.google.gson.reflect.TypeToken;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
 import static com.github.ianparkinson.helog.Strings.emptyIfNull;
+import static java.util.Arrays.asList;
 
 /**
  * {@link JsonStream} encapsulating the Hubitat Elevation's Log stream
@@ -41,6 +43,22 @@ public final class LogJsonStream implements JsonStream<LogJsonStream.LogEntry> {
                 emptyIfNull(entry.id),
                 emptyIfNull(entry.name),
                 emptyIfNull(entry.msg));
+    }
+
+    @Override
+    public List<String> csvHeader() {
+        return asList("name", "msg", "id", "time", "type", "level");
+    }
+
+    @Override
+    public Function<LogEntry, List<String>> csvFormatter() {
+        return entry -> asList(
+                emptyIfNull(entry.name),
+                emptyIfNull(entry.msg),
+                emptyIfNull(entry.id),
+                emptyIfNull(entry.time),
+                emptyIfNull(entry.type),
+                emptyIfNull(entry.level));
     }
 
     /**

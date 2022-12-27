@@ -2,6 +2,7 @@ package com.github.ianparkinson.helog;
 
 import com.google.gson.reflect.TypeToken;
 
+import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -29,4 +30,10 @@ public interface JsonStream<T> {
 
     /** Renders an entry in the stream to a human-readable line of text. */
     Function<T, String> formatter();
+
+    /** A header row, used with CSV format. */
+    List<String> csvHeader();
+
+    /** Renders an entry as a list of strings for use with CSV format. */
+    Function<T, List<String>> csvFormatter();
 }

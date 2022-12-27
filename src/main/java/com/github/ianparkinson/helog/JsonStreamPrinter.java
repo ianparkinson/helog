@@ -30,6 +30,7 @@ public final class JsonStreamPrinter<T> {
     private final Ansi ansi;
     private final TypeToken<T> jsonTypeToken;
     private final Predicate<T> filter;
+    private final String header;
     private final Function<T, String> formatter;
 
     /**
@@ -43,10 +44,12 @@ public final class JsonStreamPrinter<T> {
             Ansi ansi,
             TypeToken<T> jsonTypeToken,
             Predicate<T> filter,
+            String header,
             Function<T, String> formatter) {
         this.ansi = ansi;
         this.jsonTypeToken = jsonTypeToken;
         this.filter = filter;
+        this.header = header;
         this.formatter = formatter;
     }
 
@@ -59,6 +62,9 @@ public final class JsonStreamPrinter<T> {
      */
     public void run(Source source) {
         Source.Connection connection = source.connect();
+        if (header != null) {
+            System.out.println(header);
+        }
         JsonReader jsonReader = gson.newJsonReader(connection.getReader());
         while (true) {
             try {

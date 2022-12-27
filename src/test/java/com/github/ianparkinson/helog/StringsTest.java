@@ -3,6 +3,8 @@ package com.github.ianparkinson.helog;
 import com.google.common.truth.Truth;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static com.google.common.truth.Truth.assertThat;
 
 public final class StringsTest {
@@ -54,5 +56,41 @@ public final class StringsTest {
     @Test
     public void isHostPort_uriWithIpAddressAndPath() {
         assertThat(Strings.isHostPort("ws://1.2.3.4/logevents")).isFalse();
+    }
+
+    @Test
+    public void csvLineNoEntries() {
+        assertThat(Strings.csvLine(List.of())).isEqualTo("");
+    }
+
+    @Test
+    public void csvLineOneEntry() {
+        assertThat(Strings.csvLine(List.of("hello"))).isEqualTo("hello");
+    }
+
+    @Test
+    public void csvLineTwoEntries() {
+        assertThat(Strings.csvLine(List.of("hello", "world"))).isEqualTo("hello,world");
+    }
+
+    @Test
+    public void csvLineEscapesSpecialCharacters() {
+        assertThat(Strings.csvLine(List.of("tab\t", "newline\n", "return\r", "quote\"")))
+                .isEqualTo("\"tab\t\",\"newline\n\",\"return\r\",\"quote\"\"\"");
+    }
+
+    @Test
+    public void csvLineDoubleQuotesAtStart() {
+        assertThat(Strings.csvLine(List.of("\"hello"))).isEqualTo("\"\"\"hello\"");
+    }
+
+    @Test
+    public void csvLineDoubleQuotesAtEnd() {
+        assertThat(Strings.csvLine(List.of("hello\""))).isEqualTo("\"hello\"\"\"");
+    }
+
+    @Test
+    public void csvLineDoubleQuotesInMiddle() {
+        assertThat(Strings.csvLine(List.of("hello\"world"))).isEqualTo("\"hello\"\"world\"");
     }
 }

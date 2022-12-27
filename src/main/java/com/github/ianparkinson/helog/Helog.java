@@ -1,6 +1,7 @@
 package com.github.ianparkinson.helog;
 
 import picocli.CommandLine;
+import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Help.Ansi;
 import picocli.CommandLine.IVersionProvider;
 import picocli.CommandLine.Option;
@@ -11,6 +12,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.concurrent.Callable;
 import java.util.function.Predicate;
+
+import static com.github.ianparkinson.helog.Strings.csvLine;
 
 @CommandLine.Command(
         name = "helog",
@@ -68,9 +71,18 @@ public final class Helog implements Callable<Integer> {
                     "device name (case sensitive).")
     public String device;
 
-    @Option(names = {"-r", "--raw"},
-            description = "Write the stream exactly as received from the Hubitat Elevation.")
-    public boolean raw;
+    @ArgGroup
+    public Format format = new Format();
+
+    static class Format {
+        @Option(names = {"-r", "--raw"},
+                description = "Write the stream exactly as received from the Hubitat Elevation.")
+        public boolean raw;
+
+        @Option(names = "--csv",
+                description = "Render the stream in CSV format")
+        public boolean csv;
+    }
 
     @Option(names = "--kofi",
             description = "Buy the author a coffee.",
@@ -88,7 +100,7 @@ public final class Helog implements Callable<Integer> {
         URI uri = new URI("ws://" + host + "/" + stream.jsonStream.path());
         WebSocketSource source = new WebSocketSource(Ansi.AUTO, uri);
 
-        if (raw) {
+        if (format.raw) {
             new RawPrinter(Ansi.AUTO).run(source);
         } else {
             createJsonStreamPrinter(stream.jsonStream).run(source);
@@ -97,7 +109,7 @@ public final class Helog implements Callable<Integer> {
     }
 
     private void validateParameters() throws ParameterException {
-        if (raw && device != null) {
+        if (format.raw && device != null) {
             throw parameterException("--device cannot be used with --raw");
         }
     }
@@ -108,7 +120,16 @@ public final class Helog implements Callable<Integer> {
 
     private <T> JsonStreamPrinter<T> createJsonStreamPrinter(JsonStream<T> jsonStream) {
         Predicate<T> filter = device != null ? jsonStream.device(device) : e -> true;
-        return new JsonStreamPrinter<>(Ansi.AUTO, jsonStream.type(), filter, jsonStream.formatter());
+        if (format.csv) {
+            return new JsonStreamPrinter<>(
+                    Ansi.AUTO,
+                    jsonStream.type(),
+                    filter,
+                    csvLine(jsonStream.csvHeader()),
+                    jsonStream.csvFormatter().andThen(Strings::csvLine));
+        } else {
+            return new JsonStreamPrinter<>(Ansi.AUTO, jsonStream.type(), filter, null, jsonStream.formatter());
+        }
     }
 
     public static void kofi() {

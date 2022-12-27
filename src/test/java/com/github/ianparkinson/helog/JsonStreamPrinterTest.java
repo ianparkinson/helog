@@ -73,13 +73,29 @@ public final class JsonStreamPrinterTest {
         assertThat(err.getContent()).startsWith("Malformed JSON");
     }
 
-    private static JsonStreamPrinter<TestEntry> jsonStreamPrinter(Predicate<TestEntry> filter) {
+    @Test
+    public void printsHeader() {
+        String header = "Header";
+        String content = "{\"name\": \"foo\", \"value\": 42}";
+        jsonStreamPrinter(header).run(new FixedContentSource(content));
+        assertThat(out.getContent()).isEqualTo(lines(header, "foo 42"));
+    }
+
+    private static JsonStreamPrinter<TestEntry> jsonStreamPrinter(String header, Predicate<TestEntry> filter) {
         return new JsonStreamPrinter<>(
-                Ansi.OFF, TypeToken.get(TestEntry.class), filter, TestEntry::format);
+                Ansi.OFF, TypeToken.get(TestEntry.class), filter, header, TestEntry::format);
+    }
+
+    private static JsonStreamPrinter<TestEntry> jsonStreamPrinter(String header) {
+        return jsonStreamPrinter(header, e -> true);
+    }
+
+    private static JsonStreamPrinter<TestEntry> jsonStreamPrinter(Predicate<TestEntry> filter) {
+        return jsonStreamPrinter(null, filter);
     }
 
     private static JsonStreamPrinter<TestEntry> jsonStreamPrinter() {
-        return jsonStreamPrinter(e -> true);
+        return jsonStreamPrinter(null, e -> true);
     }
 
     private static class TestEntry {

@@ -48,4 +48,23 @@ class EventsJsonStreamTest {
 
         assertThat(eventsJsonStream.formatter().apply(entry)).isEqualTo("   1:dn n v u dt");
     }
+
+    @Test
+    void csvFormatter() {
+        EventEntry entry = new EventEntry();
+        entry.source = "s";
+        entry.name = "n";
+        entry.displayName = "dn";
+        entry.value = "v";
+        entry.type = "t";
+        entry.unit = "u";
+        entry.deviceId = 1;
+        entry.hubId = 2;
+        entry.installedAppId = 3;
+        entry.descriptionText= "dt";
+
+        assertThat(eventsJsonStream.csvFormatter().apply(entry)).containsExactly(
+                "s", "n", "dn", "v", "t", "u", "1", "2", "3", "dt"
+        ).inOrder();
+    }
 }

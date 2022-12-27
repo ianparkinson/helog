@@ -2,11 +2,13 @@ package com.github.ianparkinson.helog;
 
 import com.google.gson.reflect.TypeToken;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
 import static com.github.ianparkinson.helog.Strings.emptyIfNull;
+import static java.util.Arrays.asList;
 
 /**
  * {@link JsonStream} encapsulating the Hubitat Elevation's Events stream
@@ -36,6 +38,36 @@ public final class EventsJsonStream implements JsonStream<EventsJsonStream.Event
                 emptyIfNull(entry.name),
                 emptyIfNull(entry.value),
                 emptyIfNull(entry.unit),
+                emptyIfNull(entry.descriptionText));
+    }
+
+    @Override
+    public List<String> csvHeader() {
+        return asList(
+                "source",
+                "name",
+                "displayName",
+                "value",
+                "type",
+                "unit",
+                "deviceId",
+                "hubId",
+                "installedAppId",
+                "descriptionText");
+    }
+
+    @Override
+    public Function<EventEntry, List<String>> csvFormatter() {
+        return entry -> asList(
+                emptyIfNull(entry.source),
+                emptyIfNull(entry.name),
+                emptyIfNull(entry.displayName),
+                emptyIfNull(entry.value),
+                emptyIfNull(entry.type),
+                emptyIfNull(entry.unit),
+                Integer.toString(entry.deviceId),
+                Integer.toString(entry.hubId),
+                Integer.toString(entry.installedAppId),
                 emptyIfNull(entry.descriptionText));
     }
 
