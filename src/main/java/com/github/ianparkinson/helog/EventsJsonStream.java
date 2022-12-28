@@ -26,14 +26,14 @@ public final class EventsJsonStream implements JsonStream<EventsJsonStream.Event
 
     @Override
     public Predicate<EventEntry> device(String device) {
-        return entry -> Objects.equals(Integer.toString(entry.deviceId), device)
+        return entry -> Objects.equals(entry.deviceId, device)
                 || Objects.equals(entry.displayName, device);
     }
 
     @Override
     public Function<EventEntry, String> formatter() {
-        return entry -> String.format("%4d:%s %s %s %s %s",
-                entry.deviceId,
+        return entry -> String.format("%4s:%s %s %s %s %s",
+                emptyIfNull(entry.deviceId),
                 emptyIfNull(entry.displayName),
                 emptyIfNull(entry.name),
                 emptyIfNull(entry.value),
@@ -65,9 +65,9 @@ public final class EventsJsonStream implements JsonStream<EventsJsonStream.Event
                 emptyIfNull(entry.value),
                 emptyIfNull(entry.type),
                 emptyIfNull(entry.unit),
-                Integer.toString(entry.deviceId),
-                Integer.toString(entry.hubId),
-                Integer.toString(entry.installedAppId),
+                emptyIfNull(entry.deviceId),
+                emptyIfNull(entry.hubId),
+                emptyIfNull(entry.installedAppId),
                 emptyIfNull(entry.descriptionText));
     }
 
@@ -84,9 +84,9 @@ public final class EventsJsonStream implements JsonStream<EventsJsonStream.Event
         public String value;
         public String type;
         public String unit;
-        public int deviceId;
-        public int hubId;
-        public int installedAppId;
+        public String deviceId;
+        public String hubId;
+        public String installedAppId;
         public String descriptionText;
     }
 }

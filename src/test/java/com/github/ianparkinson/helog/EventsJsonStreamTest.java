@@ -12,7 +12,7 @@ class EventsJsonStreamTest {
     void device_numericIdMatches() {
         EventEntry entry = new EventEntry();
         entry.displayName = "dn";
-        entry.deviceId = 42;
+        entry.deviceId = "42";
         assertThat(eventsJsonStream.device("42").test(entry)).isTrue();
     }
 
@@ -20,7 +20,7 @@ class EventsJsonStreamTest {
     void device_nameMatches() {
         EventEntry entry = new EventEntry();
         entry.displayName = "dn";
-        entry.deviceId = 42;
+        entry.deviceId = "42";
         assertThat(eventsJsonStream.device("dn").test(entry)).isTrue();
     }
 
@@ -28,7 +28,7 @@ class EventsJsonStreamTest {
     void device_noMatch() {
         EventEntry entry = new EventEntry();
         entry.displayName = "dn";
-        entry.deviceId = 42;
+        entry.deviceId = "42";
         assertThat(eventsJsonStream.device("23").test(entry)).isFalse();
     }
 
@@ -41,9 +41,9 @@ class EventsJsonStreamTest {
         entry.value = "v";
         entry.type = "t";
         entry.unit = "u";
-        entry.deviceId = 1;
-        entry.hubId = 2;
-        entry.installedAppId = 3;
+        entry.deviceId = "1";
+        entry.hubId = "2";
+        entry.installedAppId = "3";
         entry.descriptionText= "dt";
 
         assertThat(eventsJsonStream.formatter().apply(entry)).isEqualTo("   1:dn n v u dt");
@@ -58,9 +58,9 @@ class EventsJsonStreamTest {
         entry.value = "v";
         entry.type = "t";
         entry.unit = "u";
-        entry.deviceId = 1;
-        entry.hubId = 2;
-        entry.installedAppId = 3;
+        entry.deviceId = "1";
+        entry.hubId = "2";
+        entry.installedAppId = "3";
         entry.descriptionText= "dt";
 
         assertThat(eventsJsonStream.csvFormatter().apply(entry)).containsExactly(
