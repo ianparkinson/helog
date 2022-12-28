@@ -43,7 +43,7 @@ class LogJsonStreamTest {
         entry.type = "ty";
         entry.level = "l";
 
-        assertThat(logJsonStream.formatter().apply(entry)).isEqualTo("ti  ty  l     i:n  m");
+        assertThat(logJsonStream.formatter().apply(entry)).isEqualTo("ti l      ty i n  m");
     }
 
     @Test

@@ -33,7 +33,7 @@ public class WritesLogsTest {
                 "\"time\":\"2022-11-05 16:25:52.729\",\"type\":\"dev\",\"level\":\"info\"}");
         HelogCommand.Result result = HelogCommand.run("log", webServer.getHostAndPort());
         assertThat(result.stdOut).isEqualTo(
-                lines("2022-11-05 16:25:52.729  dev  info  34:Christmas Tree  setSysinfo: [led:off]"));
+                lines("2022-11-05 16:25:52.729 info   dev 34 Christmas Tree  setSysinfo: [led:off]"));
     }
 
     @Test

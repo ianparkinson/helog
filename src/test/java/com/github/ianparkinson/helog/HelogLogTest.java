@@ -40,7 +40,7 @@ public final class HelogLogTest {
                 "\"time\":\"2022-11-05 16:25:52.729\",\"type\":\"dev\",\"level\":\"info\"}");
         Helog.run("log", webServer.getHostAndPort());
         assertThat(out.getContent()).isEqualTo(
-                lines("2022-11-05 16:25:52.729  dev  info  34:Christmas Tree  setSysinfo: [led:off]"));
+                lines("2022-11-05 16:25:52.729 info   dev 34 Christmas Tree  setSysinfo: [led:off]"));
     }
 
     @Test
@@ -49,7 +49,7 @@ public final class HelogLogTest {
         webServer.content.add("\"time\":\"2022-11-05 16:25:52.729\",\"type\":\"dev\",\"level\":\"info\"}");
         Helog.run("log", webServer.getHostAndPort());
         assertThat(out.getContent()).isEqualTo(
-                lines("2022-11-05 16:25:52.729  dev  info  34:Christmas Tree  setSysinfo: [led:off]"));
+                lines("2022-11-05 16:25:52.729 info   dev 34 Christmas Tree  setSysinfo: [led:off]"));
     }
 
     @Test

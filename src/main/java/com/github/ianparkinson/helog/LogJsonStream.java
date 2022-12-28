@@ -36,10 +36,10 @@ public final class LogJsonStream implements JsonStream<LogJsonStream.LogEntry> {
     }
 
     private static String format(LogEntry entry) {
-        return String.format("%s  %s  %-5s %s:%s  %s",
+        return String.format("%s %-5s  %s %s %s  %s",
                 emptyIfNull(entry.time),
-                emptyIfNull(entry.type),
                 emptyIfNull(entry.level),
+                emptyIfNull(entry.type),
                 emptyIfNull(entry.id),
                 emptyIfNull(entry.name),
                 emptyIfNull(entry.msg));
