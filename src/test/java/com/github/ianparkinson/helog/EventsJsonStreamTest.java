@@ -11,6 +11,7 @@ class EventsJsonStreamTest {
     @Test
     void device_numericIdMatches() {
         EventEntry entry = new EventEntry();
+        entry.source = "DEVICE";
         entry.displayName = "dn";
         entry.deviceId = "42";
         assertThat(eventsJsonStream.device("42").test(entry)).isTrue();
@@ -19,6 +20,7 @@ class EventsJsonStreamTest {
     @Test
     void device_nameMatches() {
         EventEntry entry = new EventEntry();
+        entry.source = "DEVICE";
         entry.displayName = "dn";
         entry.deviceId = "42";
         assertThat(eventsJsonStream.device("dn").test(entry)).isTrue();
@@ -27,9 +29,28 @@ class EventsJsonStreamTest {
     @Test
     void device_noMatch() {
         EventEntry entry = new EventEntry();
+        entry.source = "DEVICE";
         entry.displayName = "dn";
         entry.deviceId = "42";
         assertThat(eventsJsonStream.device("23").test(entry)).isFalse();
+    }
+
+    @Test
+    void device_appWithMatchingId() {
+        EventEntry entry = new EventEntry();
+        entry.source = "APP";
+        entry.displayName = "dn";
+        entry.deviceId = "42";
+        assertThat(eventsJsonStream.device("42").test(entry)).isFalse();
+    }
+
+    @Test
+    void device_appWithMatchingDisplayName() {
+        EventEntry entry = new EventEntry();
+        entry.source = "APP";
+        entry.displayName = "dn";
+        entry.deviceId = "42";
+        assertThat(eventsJsonStream.device("dn").test(entry)).isFalse();
     }
 
     @Test

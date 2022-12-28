@@ -28,8 +28,8 @@ public final class EventsJsonStream implements JsonStream<EventsJsonStream.Event
 
     @Override
     public Predicate<EventEntry> device(String device) {
-        return entry -> Objects.equals(entry.deviceId, device)
-                || Objects.equals(entry.displayName, device);
+        return entry -> "DEVICE".equals(entry.source) &&
+                (Objects.equals(entry.deviceId, device) || Objects.equals(entry.displayName, device));
     }
 
     @Override

@@ -27,7 +27,8 @@ public final class LogJsonStream implements JsonStream<LogJsonStream.LogEntry> {
 
     @Override
     public Predicate<LogEntry> device(String device) {
-        return entry -> Objects.equals(entry.id, device) || Objects.equals(entry.name, device);
+        return entry -> "dev".equalsIgnoreCase(entry.type) &&
+                (Objects.equals(entry.id, device) || Objects.equals(entry.name, device));
     }
 
     @Override

@@ -12,6 +12,7 @@ class LogJsonStreamTest {
     @Test
     void device_numericIdMatches() {
         LogEntry entry = new LogEntry();
+        entry.type = "dev";
         entry.name = "n";
         entry.id = "42";
         assertThat(logJsonStream.device("42").test(entry)).isTrue();
@@ -20,6 +21,7 @@ class LogJsonStreamTest {
     @Test
     void device_nameMatches() {
         LogEntry entry = new LogEntry();
+        entry.type = "dev";
         entry.name = "n";
         entry.id = "42";
         assertThat(logJsonStream.device("n").test(entry)).isTrue();
@@ -28,9 +30,28 @@ class LogJsonStreamTest {
     @Test
     void device_noMatch() {
         LogEntry entry = new LogEntry();
+        entry.type = "dev";
         entry.name = "n";
         entry.id = "42";
         assertThat(logJsonStream.device("23").test(entry)).isFalse();
+    }
+
+    @Test
+    void device_appWithMatchingId() {
+        LogEntry entry = new LogEntry();
+        entry.type = "app";
+        entry.name = "n";
+        entry.id = "42";
+        assertThat(logJsonStream.device("42").test(entry)).isFalse();
+    }
+
+    @Test
+    void device_appWithMatchingName() {
+        LogEntry entry = new LogEntry();
+        entry.type = "app";
+        entry.name = "n";
+        entry.id = "42";
+        assertThat(logJsonStream.device("n").test(entry)).isFalse();
     }
 
     @Test
