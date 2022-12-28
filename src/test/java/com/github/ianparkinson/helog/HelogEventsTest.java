@@ -35,12 +35,21 @@ public final class HelogEventsTest {
     }
 
     @Test
-    public void writesFormattedJson() {
+    public void writesFormattedJson_device() {
         webServer.content.add("{ \"source\":\"DEVICE\",\"name\":\"switch\",\"displayName\" : \"Christmas Tree\", " +
                 "\"value\" : \"off\", \"type\" : \"digital\", \"unit\":\"null\",\"deviceId\":34,\"hubId\":0," +
                 "\"installedAppId\":0,\"descriptionText\" : \"null\"}");
         Helog.run("events", webServer.getHostAndPort());
-        assertThat(out.getContent()).isEqualTo(lines("  34:Christmas Tree switch off  "));
+        assertThat(out.getContent()).isEqualTo(lines("DEVICE 34 Christmas Tree: switch off"));
+    }
+
+    @Test
+    public void writesFormattedJson_app() {
+        webServer.content.add("{ \"source\":\"APP\",\"name\":\"eventWithDescription\",\"displayName\" : \"null\", " +
+                "\"value\" : \"5\", \"type\" : \"null\", \"unit\":\"jiffy\",\"deviceId\":0,\"hubId\":0," +
+                "\"installedAppId\":93,\"descriptionText\" : \"This is an event\"}");
+        Helog.run("events", webServer.getHostAndPort());
+        assertThat(out.getContent()).isEqualTo(lines("APP    93: eventWithDescription 5 jiffy This is an event"));
     }
 
     @Test
@@ -49,7 +58,7 @@ public final class HelogEventsTest {
         webServer.content.add("\"value\" : \"off\", \"type\" : \"digital\", \"unit\":\"null\",\"deviceId\":34,");
         webServer.content.add("\"hubId\":0,\"installedAppId\":0,\"descriptionText\" : \"null\"}");
         Helog.run("events", webServer.getHostAndPort());
-        assertThat(out.getContent()).isEqualTo(lines("  34:Christmas Tree switch off  "));
+        assertThat(out.getContent()).isEqualTo(lines("DEVICE 34 Christmas Tree: switch off"));
     }
 
     @Test

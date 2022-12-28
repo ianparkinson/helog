@@ -33,9 +33,43 @@ class EventsJsonStreamTest {
     }
 
     @Test
-    void formatter() {
+    void formatterDevice() {
         EventEntry entry = new EventEntry();
-        entry.source = "s";
+        entry.source = "DEVICE";
+        entry.name = "n";
+        entry.displayName = "dn";
+        entry.value = "v";
+        entry.type = "t";
+        entry.unit = "u";
+        entry.deviceId = "1";
+        entry.hubId = "2";
+        entry.installedAppId = "0";
+        entry.descriptionText= "dt";
+
+        assertThat(eventsJsonStream.formatter().apply(entry)).isEqualTo("DEVICE 1 dn: n v u dt");
+    }
+
+    @Test
+    void formatterApp() {
+        EventEntry entry = new EventEntry();
+        entry.source = "APP";
+        entry.name = "n";
+        entry.displayName = "dn";
+        entry.value = "v";
+        entry.type = "t";
+        entry.unit = "u";
+        entry.deviceId = "0";
+        entry.hubId = "2";
+        entry.installedAppId = "3";
+        entry.descriptionText= "dt";
+
+        assertThat(eventsJsonStream.formatter().apply(entry)).isEqualTo("APP    3 dn: n v u dt");
+    }
+
+    @Test
+    void formatterAppUnknownSource() {
+        EventEntry entry = new EventEntry();
+        entry.source = "???";
         entry.name = "n";
         entry.displayName = "dn";
         entry.value = "v";
@@ -46,7 +80,7 @@ class EventsJsonStreamTest {
         entry.installedAppId = "3";
         entry.descriptionText= "dt";
 
-        assertThat(eventsJsonStream.formatter().apply(entry)).isEqualTo("   1:dn n v u dt");
+        assertThat(eventsJsonStream.formatter().apply(entry)).isEqualTo("???    1 3 dn: n v u dt");
     }
 
     @Test

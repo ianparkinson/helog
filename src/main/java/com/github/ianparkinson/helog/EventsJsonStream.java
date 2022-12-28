@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.github.ianparkinson.helog.Strings.emptyIfNull;
 import static java.util.Arrays.asList;
@@ -32,13 +34,30 @@ public final class EventsJsonStream implements JsonStream<EventsJsonStream.Event
 
     @Override
     public Function<EventEntry, String> formatter() {
-        return entry -> String.format("%4s:%s %s %s %s %s",
-                emptyIfNull(entry.deviceId),
-                emptyIfNull(entry.displayName),
+        return EventsJsonStream::format;
+    }
+
+    private static String format(EventEntry entry) {
+        List<String> prefixParts = Stream.of(
+                String.format("%-6s", emptyIfNull(entry.source)),
+                emptyIfNullOrZero(entry.deviceId),
+                emptyIfNullOrZero(entry.installedAppId),
+                emptyIfNull(entry.displayName))
+                .filter(v -> !v.isEmpty())
+                .collect(Collectors.toList());
+        List<String> suffixParts = Stream.of(
                 emptyIfNull(entry.name),
                 emptyIfNull(entry.value),
                 emptyIfNull(entry.unit),
-                emptyIfNull(entry.descriptionText));
+                emptyIfNull(entry.descriptionText))
+                .filter(v -> !v.isEmpty())
+                .collect(Collectors.toList());
+        return String.join(" ", prefixParts) + ": " + String.join(" ", suffixParts);
+    }
+
+    private static String emptyIfNullOrZero(String id) {
+        id = emptyIfNull(id);
+        return (id.trim().equals("0")) ? "" : id;
     }
 
     @Override

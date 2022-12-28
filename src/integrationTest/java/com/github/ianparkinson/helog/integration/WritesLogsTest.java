@@ -24,7 +24,7 @@ public class WritesLogsTest {
                 "\"value\" : \"off\", \"type\" : \"digital\", \"unit\":\"null\",\"deviceId\":34,\"hubId\":0," +
                 "\"installedAppId\":0,\"descriptionText\" : \"null\"}");
         HelogCommand.Result result = HelogCommand.run("events", webServer.getHostAndPort());
-        assertThat(result.stdOut).isEqualTo(lines("  34:Christmas Tree switch off  "));
+        assertThat(result.stdOut).isEqualTo(lines("DEVICE 34 Christmas Tree: switch off"));
     }
 
     @Test
