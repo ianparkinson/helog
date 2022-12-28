@@ -59,6 +59,26 @@ public final class StringsTest {
     }
 
     @Test
+    public void isInteger_null() {
+        assertThat(Strings.isInteger(null)).isFalse();
+    }
+
+    @Test
+    public void isInteger_int() {
+        assertThat(Strings.isInteger("42")).isTrue();
+    }
+
+    @Test
+    public void isInteger_empty() {
+        assertThat(Strings.isInteger("")).isFalse();
+    }
+
+    @Test
+    public void isInteger_alpha() {
+        assertThat(Strings.isInteger("text")).isFalse();
+    }
+
+    @Test
     public void csvLineNoEntries() {
         assertThat(Strings.csvLine(List.of())).isEqualTo("");
     }

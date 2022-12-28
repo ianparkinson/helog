@@ -33,6 +33,11 @@ public final class EventsJsonStream implements JsonStream<EventsJsonStream.Event
     }
 
     @Override
+    public Predicate<EventEntry> app(String app) {
+        return entry -> "APP".equals(entry.source) && Objects.equals(entry.installedAppId, app);
+    }
+
+    @Override
     public Function<EventEntry, String> formatter() {
         return EventsJsonStream::format;
     }

@@ -55,6 +55,51 @@ class LogJsonStreamTest {
     }
 
     @Test
+    void app_numericIdMatches() {
+        LogEntry entry = new LogEntry();
+        entry.type = "app";
+        entry.name = "n";
+        entry.id = "42";
+        assertThat(logJsonStream.app("42").test(entry)).isTrue();
+    }
+
+    @Test
+    void app_nameMatches() {
+        LogEntry entry = new LogEntry();
+        entry.type = "app";
+        entry.name = "n";
+        entry.id = "42";
+        assertThat(logJsonStream.app("n").test(entry)).isTrue();
+    }
+
+    @Test
+    void app_noMatch() {
+        LogEntry entry = new LogEntry();
+        entry.type = "app";
+        entry.name = "n";
+        entry.id = "42";
+        assertThat(logJsonStream.app("23").test(entry)).isFalse();
+    }
+
+    @Test
+    void app_deviceWithMatchingId() {
+        LogEntry entry = new LogEntry();
+        entry.type = "dev";
+        entry.name = "n";
+        entry.id = "42";
+        assertThat(logJsonStream.app("42").test(entry)).isFalse();
+    }
+
+    @Test
+    void app_deviceWithMatchingName() {
+        LogEntry entry = new LogEntry();
+        entry.type = "dev";
+        entry.name = "n";
+        entry.id = "42";
+        assertThat(logJsonStream.app("n").test(entry)).isFalse();
+    }
+
+    @Test
     void formatter() {
         LogEntry entry = new LogEntry();
         entry.name = "n";

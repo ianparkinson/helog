@@ -54,6 +54,40 @@ class EventsJsonStreamTest {
     }
 
     @Test
+    void app_numericIdMatches() {
+        EventEntry entry = new EventEntry();
+        entry.source = "APP";
+        entry.installedAppId = "42";
+        assertThat(eventsJsonStream.app("42").test(entry)).isTrue();
+    }
+
+    @Test
+    void app_noMatch() {
+        EventEntry entry = new EventEntry();
+        entry.source = "APP";
+        entry.installedAppId = "42";
+        assertThat(eventsJsonStream.app("23").test(entry)).isFalse();
+    }
+
+    @Test
+    void app_deviceWithMatchingId() {
+        EventEntry entry = new EventEntry();
+        entry.source = "DEVICE";
+        entry.displayName = "dn";
+        entry.deviceId = "42";
+        entry.installedAppId = "42";
+        assertThat(eventsJsonStream.app("42").test(entry)).isFalse();
+    }
+
+    @Test
+    void app_deviceWithMatchingDisplayName() {
+        EventEntry entry = new EventEntry();
+        entry.source = "DEVICE";
+        entry.displayName = "dn";
+        assertThat(eventsJsonStream.app("dn").test(entry)).isFalse();
+    }
+
+    @Test
     void formatterDevice() {
         EventEntry entry = new EventEntry();
         entry.source = "DEVICE";

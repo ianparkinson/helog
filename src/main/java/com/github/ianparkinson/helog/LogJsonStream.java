@@ -32,6 +32,12 @@ public final class LogJsonStream implements JsonStream<LogJsonStream.LogEntry> {
     }
 
     @Override
+    public Predicate<LogEntry> app(String app) {
+        return entry -> "app".equalsIgnoreCase(entry.type) &&
+                (Objects.equals(entry.id, app) || Objects.equals(entry.name, app));
+    }
+
+    @Override
     public Function<LogEntry, String> formatter() {
         return LogJsonStream::format;
     }

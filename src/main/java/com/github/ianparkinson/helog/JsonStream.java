@@ -23,10 +23,19 @@ public interface JsonStream<T> {
     TypeToken<T> type();
 
     /**
-     * Filter by device. {@code device} may be either the full name of a device, or the String representation of its
-     * numeric id.
+     * Filter by device.
+     *
+     * <p>{@code device} may be either the full name of a device, or the String representation of its numeric id.
      */
     Predicate<T> device(String device);
+
+    /**
+     * Filter by app.
+     *
+     * <p>For {@code logsocket}, {@code app} may be either the full name of an app or the String representation of its
+     * numeric id. For {@code eventsocket}, it must be the numeric id.
+     */
+    Predicate<T> app(String app);
 
     /** Renders an entry in the stream to a human-readable line of text. */
     Function<T, String> formatter();

@@ -77,14 +77,53 @@ public final class HelogLogTest {
     }
 
     @Test
-    public void deviceMultipleIds() {
+    public void appMatchesName() {
+        webServer.content.add("{\"name\":\"Christmas Tree\",\"msg\":\"setSysinfo: [led:off]\",\"id\":34, " +
+                "\"time\":\"2022-11-05 16:25:52.729\",\"type\":\"app\",\"level\":\"info\"}");
+        Helog.run("log", webServer.getHostAndPort(), "--app=\"Christmas Tree\"");
+        assertThat(out.getContent()).isNotEmpty();
+    }
+
+    @Test
+    public void appMatchesId() {
+        webServer.content.add("{\"name\":\"Christmas Tree\",\"msg\":\"setSysinfo: [led:off]\",\"id\":34, " +
+                "\"time\":\"2022-11-05 16:25:52.729\",\"type\":\"app\",\"level\":\"info\"}");
+        Helog.run("log", webServer.getHostAndPort(), "--app=34");
+        assertThat(out.getContent()).isNotEmpty();
+    }
+
+    @Test
+    public void appMatchesNeitherNameNorId() {
+        webServer.content.add("{\"name\":\"Christmas Tree\",\"msg\":\"setSysinfo: [led:off]\",\"id\":34, " +
+                "\"time\":\"2022-11-05 16:25:52.729\",\"type\":\"app\",\"level\":\"info\"}");
+        Helog.run("log", webServer.getHostAndPort(), "--app=23");
+        assertThat(out.getContent()).isEmpty();
+    }
+
+    @Test
+    public void appMultipleIds() {
         webServer.content.add("{\"name\":\"ThirtyFour\",\"msg\":\"setSysinfo: [led:off]\",\"id\":34, " +
-                "\"time\":\"2022-11-05 16:25:52.729\",\"type\":\"dev\",\"level\":\"info\"}");
+                "\"time\":\"2022-11-05 16:25:52.729\",\"type\":\"app\",\"level\":\"info\"}");
         webServer.content.add("{\"name\":\"ThirtyFive\",\"msg\":\"setSysinfo: [led:off]\",\"id\":35, " +
-                "\"time\":\"2022-11-05 16:25:52.729\",\"type\":\"dev\",\"level\":\"info\"}");
+                "\"time\":\"2022-11-05 16:25:52.729\",\"type\":\"app\",\"level\":\"info\"}");
+        webServer.content.add("{\"name\":\"ThirtySix\",\"msg\":\"setSysinfo: [led:off]\",\"id\":36, " +
+                "\"time\":\"2022-11-05 16:25:52.729\",\"type\":\"app\",\"level\":\"info\"}");
+        Helog.run("log", webServer.getHostAndPort(), "--app=34,36");
+        String[] lines = splitLines(out.getContent());
+        assertThat(lines).hasLength(2);
+        assertThat(lines[0]).contains("ThirtyFour");
+        assertThat(lines[1]).contains("ThirtySix");
+    }
+
+    @Test
+    public void deviceAndApp() {
+        webServer.content.add("{\"name\":\"ThirtyFour\",\"msg\":\"setSysinfo: [led:off]\",\"id\":34, " +
+                "\"time\":\"2022-11-05 16:25:52.729\",\"type\":\"app\",\"level\":\"info\"}");
+        webServer.content.add("{\"name\":\"ThirtyFive\",\"msg\":\"setSysinfo: [led:off]\",\"id\":35, " +
+                "\"time\":\"2022-11-05 16:25:52.729\",\"type\":\"app\",\"level\":\"info\"}");
         webServer.content.add("{\"name\":\"ThirtySix\",\"msg\":\"setSysinfo: [led:off]\",\"id\":36, " +
                 "\"time\":\"2022-11-05 16:25:52.729\",\"type\":\"dev\",\"level\":\"info\"}");
-        Helog.run("log", webServer.getHostAndPort(), "--device=34,36");
+        Helog.run("log", webServer.getHostAndPort(), "--app=34", "--device=36");
         String[] lines = splitLines(out.getContent());
         assertThat(lines).hasLength(2);
         assertThat(lines[0]).contains("ThirtyFour");
@@ -111,14 +150,21 @@ public final class HelogLogTest {
 
     @Test
     public void rawDisallowsDevice() {
-        int code = Helog.run("events", webServer.getHostAndPort(), "--raw", "--device=42");
+        int code = Helog.run("log", webServer.getHostAndPort(), "--raw", "--device=42");
+        assertThat(err.getContent()).startsWith(ERROR_PREFIX);
+        assertThat(code).isEqualTo(2);
+    }
+
+    @Test
+    public void rawDisallowsApp() {
+        int code = Helog.run("log", webServer.getHostAndPort(), "--raw", "--app=42");
         assertThat(err.getContent()).startsWith(ERROR_PREFIX);
         assertThat(code).isEqualTo(2);
     }
 
     @Test
     public void rawAndCsvMutuallyExclusive() {
-        int code = Helog.run("events", webServer.getHostAndPort(), "--raw", "--csv");
+        int code = Helog.run("log", webServer.getHostAndPort(), "--raw", "--csv");
         assertThat(err.getContent()).startsWith(ERROR_PREFIX);
         assertThat(code).isEqualTo(2);
     }

@@ -73,6 +73,12 @@ public final class Helog implements Callable<Integer> {
                     "device name (case sensitive).")
     public List<String> device;
 
+    @Option(names = "--app",
+            split = ",",
+            description = "Writes logs for specific apps, specified using the numeric id. If used with " +
+                    "@|bold log|@, the app name (case sensitive) can also be used.")
+    public List<String> app;
+
     @ArgGroup
     public Format format = new Format();
 
@@ -114,6 +120,12 @@ public final class Helog implements Callable<Integer> {
         if (format.raw && device != null) {
             throw parameterException("--device cannot be used with --raw");
         }
+        if (format.raw && app != null) {
+            throw parameterException("--app cannot be used with --raw");
+        }
+        if (stream == Stream.EVENTS && app != null && !app.stream().allMatch(Strings::isInteger)) {
+            throw parameterException("Events cannot be filtered by app name. Use the numeric id instead.");
+        }
     }
 
     private ParameterException parameterException(String message) {
@@ -135,8 +147,19 @@ public final class Helog implements Callable<Integer> {
     }
 
     private <T> Predicate<T> createFilter(JsonStream<T> jsonStream) {
-        if (device == null || device.isEmpty()) return e -> true;
-        return device.stream().map(jsonStream::device).reduce(Predicate::or).get();
+        if (isNullOrEmpty(device) && isNullOrEmpty(app)) return e -> true;
+
+        Predicate<T> devicePredicate = stream(device).map(jsonStream::device).reduce(e -> false, Predicate::or);
+        Predicate<T> appPredicate = stream(app).map(jsonStream::app).reduce(e -> false, Predicate::or);
+        return devicePredicate.or(appPredicate);
+    }
+
+    private <T> boolean isNullOrEmpty(List<T> list) {
+        return (list == null || list.isEmpty());
+    }
+
+    private <T> java.util.stream.Stream<T> stream(List<T> list) {
+        return (list == null) ? java.util.stream.Stream.empty() : list.stream();
     }
 
     public static void kofi() {

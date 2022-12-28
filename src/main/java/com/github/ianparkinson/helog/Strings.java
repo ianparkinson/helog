@@ -26,6 +26,21 @@ final class Strings {
     }
 
     /**
+     * Tests the given string to see if it can be parsed as an int.
+     */
+    public static boolean isInteger(String input) {
+        if (input == null) {
+            return false;
+        }
+        try {
+            Integer.parseInt(input);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    /**
      * Renders a list of strings as a line of CSV, absent a trailing newline.
      */
     public static String csvLine(List<String> strings) {
