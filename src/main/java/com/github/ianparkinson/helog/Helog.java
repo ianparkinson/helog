@@ -10,6 +10,7 @@ import picocli.CommandLine.Parameters;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.function.Predicate;
 
@@ -67,9 +68,10 @@ public final class Helog implements Callable<Integer> {
     }
 
     @Option(names = "--device",
-            description = "Writes logs for a specific device, specified using either the numeric id or the full " +
+            split = ",",
+            description = "Writes logs for specific devices, specified using either the numeric id or the full " +
                     "device name (case sensitive).")
-    public String device;
+    public List<String> device;
 
     @ArgGroup
     public Format format = new Format();
@@ -119,7 +121,7 @@ public final class Helog implements Callable<Integer> {
     }
 
     private <T> JsonStreamPrinter<T> createJsonStreamPrinter(JsonStream<T> jsonStream) {
-        Predicate<T> filter = device != null ? jsonStream.device(device) : e -> true;
+        Predicate<T> filter = createFilter(jsonStream);
         if (format.csv) {
             return new JsonStreamPrinter<>(
                     Ansi.AUTO,
@@ -130,6 +132,11 @@ public final class Helog implements Callable<Integer> {
         } else {
             return new JsonStreamPrinter<>(Ansi.AUTO, jsonStream.type(), filter, null, jsonStream.formatter());
         }
+    }
+
+    private <T> Predicate<T> createFilter(JsonStream<T> jsonStream) {
+        if (device == null || device.isEmpty()) return e -> true;
+        return device.stream().map(jsonStream::device).reduce(Predicate::or).get();
     }
 
     public static void kofi() {

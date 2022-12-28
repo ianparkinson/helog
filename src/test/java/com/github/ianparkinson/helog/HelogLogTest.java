@@ -77,6 +77,21 @@ public final class HelogLogTest {
     }
 
     @Test
+    public void deviceMultipleIds() {
+        webServer.content.add("{\"name\":\"ThirtyFour\",\"msg\":\"setSysinfo: [led:off]\",\"id\":34, " +
+                "\"time\":\"2022-11-05 16:25:52.729\",\"type\":\"dev\",\"level\":\"info\"}");
+        webServer.content.add("{\"name\":\"ThirtyFive\",\"msg\":\"setSysinfo: [led:off]\",\"id\":35, " +
+                "\"time\":\"2022-11-05 16:25:52.729\",\"type\":\"dev\",\"level\":\"info\"}");
+        webServer.content.add("{\"name\":\"ThirtySix\",\"msg\":\"setSysinfo: [led:off]\",\"id\":36, " +
+                "\"time\":\"2022-11-05 16:25:52.729\",\"type\":\"dev\",\"level\":\"info\"}");
+        Helog.run("log", webServer.getHostAndPort(), "--device=34,36");
+        String[] lines = splitLines(out.getContent());
+        assertThat(lines).hasLength(2);
+        assertThat(lines[0]).contains("ThirtyFour");
+        assertThat(lines[1]).contains("ThirtySix");
+    }
+
+    @Test
     public void writesInCsvFormat() {
         webServer.content.add("{\"name\":\"Christmas Tree\",\"msg\":\"setSysinfo: [led:off]\",\"id\":34, " +
                 "\"time\":\"2022-11-05 16:25:52.729\",\"type\":\"dev\",\"level\":\"info\"}");
