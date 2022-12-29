@@ -13,7 +13,7 @@ The `helog` command executable can be found inside the `bin` directory of the un
 
 ## Usage
 
-To display the Eleveation's debug log, find your Elevation's IP address (I'll assume it's 192.168.1.200) and run:
+To display the Elevation's debug log, find your Elevation's IP address (I'll assume it's 192.168.1.200) and run:
 
 `helog log 192.168.1.200`
 
