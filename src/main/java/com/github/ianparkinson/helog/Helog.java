@@ -73,11 +73,26 @@ public final class Helog implements Callable<Integer> {
                     "device name (case sensitive).")
     public List<String> device;
 
+    @Option(names = "--xdevice",
+            split = ",",
+            description = "Exclude specific devices, specified using either the numeric id or the full " +
+                    "device name (case sensitive).",
+            paramLabel = "device")
+    public List<String> excludeDevice;
+
     @Option(names = "--app",
             split = ",",
             description = "Writes logs for specific apps, specified using the numeric id. If used with " +
                     "@|bold log|@, the app name (case sensitive) can also be used.")
     public List<String> app;
+
+    @Option(names = "--xapp",
+            split = ",",
+            description = "Exclude specific apps, specified using the numeric id. If used with " +
+                    "@|bold log|@, the app name (case sensitive) can also be used.",
+            paramLabel = "app")
+    public List<String> excludeApp;
+
 
     @ArgGroup
     public Format format = new Format();
@@ -117,13 +132,27 @@ public final class Helog implements Callable<Integer> {
     }
 
     private void validateParameters() throws ParameterException {
-        if (format.raw && device != null) {
-            throw parameterException("--device cannot be used with --raw");
+        if (format.raw) {
+            if (device != null) {
+                throw parameterException("--device cannot be used with --raw");
+            }
+            if (excludeDevice != null) {
+                throw parameterException("--xdevice cannot be used with --raw");
+            }
+            if (app != null) {
+                throw parameterException("--app cannot be used with --raw");
+            }
+            if (excludeApp != null) {
+                throw parameterException("--xapp cannot be used with --raw");
+            }
         }
-        if (format.raw && app != null) {
-            throw parameterException("--app cannot be used with --raw");
+
+        if ((device != null || app != null) && (excludeDevice != null || excludeApp != null)) {
+            throw parameterException("--device or --app cannot be used with --xdevice or --xapp");
         }
-        if (stream == Stream.EVENTS && app != null && !app.stream().allMatch(Strings::isInteger)) {
+
+        if (stream == Stream.EVENTS
+                && (!stream(app).allMatch(Strings::isInteger) || !stream(excludeApp).allMatch(Strings::isInteger))) {
             throw parameterException("Events cannot be filtered by app name. Use the numeric id instead.");
         }
     }
@@ -147,11 +176,23 @@ public final class Helog implements Callable<Integer> {
     }
 
     private <T> Predicate<T> createFilter(JsonStream<T> jsonStream) {
-        if (isNullOrEmpty(device) && isNullOrEmpty(app)) return e -> true;
-
-        Predicate<T> devicePredicate = stream(device).map(jsonStream::device).reduce(e -> false, Predicate::or);
-        Predicate<T> appPredicate = stream(app).map(jsonStream::app).reduce(e -> false, Predicate::or);
-        return devicePredicate.or(appPredicate);
+        if (!(isNullOrEmpty(device) && isNullOrEmpty(app))) {
+            Predicate<T> devicePredicate = stream(device).map(jsonStream::device).reduce(e -> false, Predicate::or);
+            Predicate<T> appPredicate = stream(app).map(jsonStream::app).reduce(e -> false, Predicate::or);
+            return devicePredicate.or(appPredicate);
+        } else if (!(isNullOrEmpty(excludeDevice) && isNullOrEmpty(excludeApp))) {
+            Predicate<T> devicePredicate = stream(excludeDevice)
+                    .map(jsonStream::device)
+                    .map(Predicate::not)
+                    .reduce(e -> true, Predicate::and);
+            Predicate<T> appPredicate = stream(excludeApp)
+                    .map(jsonStream::app)
+                    .map(Predicate::not)
+                    .reduce(e -> true, Predicate::and);
+            return devicePredicate.and(appPredicate);
+        } else {
+            return e -> true;
+        }
     }
 
     private <T> boolean isNullOrEmpty(List<T> list) {
