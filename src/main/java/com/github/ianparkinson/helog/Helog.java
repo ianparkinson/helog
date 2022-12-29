@@ -73,6 +73,13 @@ public final class Helog implements Callable<Integer> {
                     "device name (case sensitive).")
     public List<String> device;
 
+    @Option(names = "--xdevice",
+            split = ",",
+            description = "Exclude specific devices, specified using either the numeric id or the full " +
+                    "device name (case sensitive).",
+            paramLabel = "device")
+    public List<String> excludeDevice;
+
     @Option(names = "--app",
             split = ",",
             description = "Writes logs for specific apps, specified using the numeric id. If used with " +
@@ -117,12 +124,22 @@ public final class Helog implements Callable<Integer> {
     }
 
     private void validateParameters() throws ParameterException {
-        if (format.raw && device != null) {
-            throw parameterException("--device cannot be used with --raw");
+        if (format.raw) {
+            if (device != null) {
+                throw parameterException("--device cannot be used with --raw");
+            }
+            if (excludeDevice != null) {
+                throw parameterException("--xdevice cannot be used with --raw");
+            }
+            if (app != null) {
+                throw parameterException("--app cannot be used with --raw");
+            }
         }
-        if (format.raw && app != null) {
-            throw parameterException("--app cannot be used with --raw");
+
+        if ((device != null || app != null) && excludeDevice != null) {
+            throw parameterException("--device or --app cannot be used with --xdevice");
         }
+
         if (stream == Stream.EVENTS && app != null && !app.stream().allMatch(Strings::isInteger)) {
             throw parameterException("Events cannot be filtered by app name. Use the numeric id instead.");
         }
@@ -147,11 +164,18 @@ public final class Helog implements Callable<Integer> {
     }
 
     private <T> Predicate<T> createFilter(JsonStream<T> jsonStream) {
-        if (isNullOrEmpty(device) && isNullOrEmpty(app)) return e -> true;
-
-        Predicate<T> devicePredicate = stream(device).map(jsonStream::device).reduce(e -> false, Predicate::or);
-        Predicate<T> appPredicate = stream(app).map(jsonStream::app).reduce(e -> false, Predicate::or);
-        return devicePredicate.or(appPredicate);
+        if (!(isNullOrEmpty(device) && isNullOrEmpty(app))) {
+            Predicate<T> devicePredicate = stream(device).map(jsonStream::device).reduce(e -> false, Predicate::or);
+            Predicate<T> appPredicate = stream(app).map(jsonStream::app).reduce(e -> false, Predicate::or);
+            return devicePredicate.or(appPredicate);
+        } else if (!isNullOrEmpty(excludeDevice)) {
+            return stream(excludeDevice)
+                    .map(jsonStream::device)
+                    .map(Predicate::not)
+                    .reduce(e -> true, Predicate::and);
+        } else {
+            return e -> true;
+        }
     }
 
     private <T> boolean isNullOrEmpty(List<T> list) {

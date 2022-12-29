@@ -107,6 +107,59 @@ public final class HelogEventsTest {
     }
 
     @Test
+    public void excludeDeviceByName() {
+        webServer.content.add("{ \"source\":\"DEVICE\",\"name\":\"switch\",\"displayName\" : \"NoMatch\", " +
+                "\"value\" : \"NoMatch\", \"type\" : \"digital\", \"unit\":\"null\",\"deviceId\":34,\"hubId\":0," +
+                "\"installedAppId\":0,\"descriptionText\" : \"null\"}");
+        webServer.content.add("{ \"source\":\"DEVICE\",\"name\":\"switch\",\"displayName\" : \"Match\", " +
+                "\"value\" : \"DeviceMatch\", \"type\" : \"digital\", \"unit\":\"null\",\"deviceId\":35,\"hubId\":0," +
+                "\"installedAppId\":0,\"descriptionText\" : \"null\"}");
+        webServer.content.add("{ \"source\":\"APP\",\"name\":\"switch\",\"displayName\" : \"AppMatch\", " +
+                "\"value\" : \"AppMatch\", \"type\" : \"digital\", \"unit\":\"null\",\"deviceId\":0,\"hubId\":0," +
+                "\"installedAppId\":36,\"descriptionText\" : \"null\"}");
+        Helog.run("events", webServer.getHostAndPort(), "--xdevice=Match");
+        String[] lines = splitLines(out.getContent());
+        assertThat(lines).hasLength(2);
+        assertThat(lines[0]).contains("NoMatch");
+        assertThat(lines[1]).contains("AppMatch");
+    }
+
+    @Test
+    public void excludeDeviceById() {
+        webServer.content.add("{ \"source\":\"DEVICE\",\"name\":\"switch\",\"displayName\" : \"ThirtyFour\", " +
+                "\"value\" : \"ThirtyFour\", \"type\" : \"digital\", \"unit\":\"null\",\"deviceId\":34,\"hubId\":0," +
+                "\"installedAppId\":0,\"descriptionText\" : \"null\"}");
+        webServer.content.add("{ \"source\":\"DEVICE\",\"name\":\"switch\",\"displayName\" : \"ThirtyFive\", " +
+                "\"value\" : \"ThirtyFive\", \"type\" : \"digital\", \"unit\":\"null\",\"deviceId\":35,\"hubId\":0," +
+                "\"installedAppId\":0,\"descriptionText\" : \"null\"}");
+        webServer.content.add("{ \"source\":\"APP\",\"name\":\"switch\",\"displayName\" : \"ThirtySix\", " +
+                "\"value\" : \"ThirtySix\", \"type\" : \"digital\", \"unit\":\"null\",\"deviceId\":35,\"hubId\":0," +
+                "\"installedAppId\":35,\"descriptionText\" : \"null\"}");
+        Helog.run("events", webServer.getHostAndPort(), "--xdevice=35");
+        String[] lines = splitLines(out.getContent());
+        assertThat(lines).hasLength(2);
+        assertThat(lines[0]).contains("ThirtyFour");
+        assertThat(lines[1]).contains("ThirtySix");
+    }
+
+    @Test
+    public void excludeDeviceMultipleIds() {
+        webServer.content.add("{ \"source\":\"DEVICE\",\"name\":\"switch\",\"displayName\" : \"ThirtyFour\", " +
+                "\"value\" : \"ThirtyFour\", \"type\" : \"digital\", \"unit\":\"null\",\"deviceId\":34,\"hubId\":0," +
+                "\"installedAppId\":0,\"descriptionText\" : \"null\"}");
+        webServer.content.add("{ \"source\":\"DEVICE\",\"name\":\"switch\",\"displayName\" : \"ThirtyFive\", " +
+                "\"value\" : \"ThirtyFive\", \"type\" : \"digital\", \"unit\":\"null\",\"deviceId\":35,\"hubId\":0," +
+                "\"installedAppId\":0,\"descriptionText\" : \"null\"}");
+        webServer.content.add("{ \"source\":\"DEVICE\",\"name\":\"switch\",\"displayName\" : \"ThirtySix\", " +
+                "\"value\" : \"ThirtySix\", \"type\" : \"digital\", \"unit\":\"null\",\"deviceId\":36,\"hubId\":0," +
+                "\"installedAppId\":0,\"descriptionText\" : \"null\"}");
+        Helog.run("events", webServer.getHostAndPort(), "--xdevice=34,36");
+        String[] lines = splitLines(out.getContent());
+        assertThat(lines).hasLength(1);
+        assertThat(lines[0]).contains("ThirtyFive");
+    }
+
+    @Test
     public void appMatchesId() {
         webServer.content.add("{ \"source\":\"APP\",\"name\":\"switch\",\"displayName\" : \"\", " +
                 "\"value\" : \"off\", \"type\" : \"digital\", \"unit\":\"null\",\"deviceId\":0,\"hubId\":0," +
@@ -168,6 +221,13 @@ public final class HelogEventsTest {
     }
 
     @Test
+    public void inclusiveAndExclusiveDeviceDisallowed() {
+        int code = Helog.run("events", webServer.getHostAndPort(), "--device=43", "--xdevice=42");
+        assertThat(err.getContent()).startsWith(ERROR_PREFIX);
+        assertThat(code).isEqualTo(2);
+    }
+
+    @Test
     public void writesInCsvFormat() {
         webServer.content.add("{ \"source\":\"DEVICE\",\"name\":\"switch\",\"displayName\" : \"Christmas Tree\", " +
                 "\"value\" : \"off\", \"type\" : \"digital\", \"unit\":\"null\",\"deviceId\":34,\"hubId\":0," +
@@ -189,6 +249,13 @@ public final class HelogEventsTest {
     @Test
     public void rawDisallowsDevice() {
         int code = Helog.run("events", webServer.getHostAndPort(), "--raw", "--device=42");
+        assertThat(err.getContent()).startsWith(ERROR_PREFIX);
+        assertThat(code).isEqualTo(2);
+    }
+
+    @Test
+    public void rawDisallowsXDevice() {
+        int code = Helog.run("events", webServer.getHostAndPort(), "--raw", "--xdevice=42");
         assertThat(err.getContent()).startsWith(ERROR_PREFIX);
         assertThat(code).isEqualTo(2);
     }
