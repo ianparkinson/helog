@@ -1,4 +1,4 @@
-package com.github.ianparkinson.helog;
+package com.github.ianparkinson.helog.util;
 
 import com.google.common.truth.Truth;
 import org.junit.jupiter.api.Test;

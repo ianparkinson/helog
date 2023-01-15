@@ -1,4 +1,4 @@
-package com.github.ianparkinson.helog;
+package com.github.ianparkinson.helog.app;
 
 import com.google.gson.reflect.TypeToken;
 

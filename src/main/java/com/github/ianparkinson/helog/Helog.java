@@ -1,5 +1,14 @@
 package com.github.ianparkinson.helog;
 
+import com.github.ianparkinson.helog.app.JsonStream;
+import com.github.ianparkinson.helog.app.JsonStreamPrinter;
+import com.github.ianparkinson.helog.app.RawPrinter;
+import com.github.ianparkinson.helog.app.WebSocketSource;
+import com.github.ianparkinson.helog.cli.FilterOptions;
+import com.github.ianparkinson.helog.cli.FormatOptions;
+import com.github.ianparkinson.helog.cli.ParameterValidationException;
+import com.github.ianparkinson.helog.cli.Stream;
+import com.github.ianparkinson.helog.util.Strings;
 import picocli.CommandLine;
 import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Help.Ansi;
@@ -10,11 +19,10 @@ import picocli.CommandLine.Parameters;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.function.Predicate;
 
-import static com.github.ianparkinson.helog.Strings.csvLine;
+import static com.github.ianparkinson.helog.util.Strings.csvLine;
 
 @CommandLine.Command(
         name = "helog",
@@ -31,21 +39,10 @@ public final class Helog implements Callable<Integer> {
 
     static final String HEADER =
             "Writes live logs from a Hubitat Elevation's /logsocket or /eventsocket streams to stdout.";
-    static final String ERROR_PREFIX = "Error: ";
+    public static final String ERROR_PREFIX = "Error: ";
 
     @CommandLine.Spec
     private CommandLine.Model.CommandSpec commandSpec;
-
-    private enum Stream {
-        LOG(new LogJsonStream()),
-        EVENTS(new EventsJsonStream());
-
-        private final JsonStream<?> jsonStream;
-
-        Stream(JsonStream<?> jsonStream) {
-            this.jsonStream = jsonStream;
-        }
-    }
 
     @Parameters(index = "0", hidden = true)
     private Stream stream;
@@ -67,45 +64,13 @@ public final class Helog implements Callable<Integer> {
         }
     }
 
-    @Option(names = "--device",
-            split = ",",
-            description = "Writes logs for specific devices, specified using either the numeric id or the full " +
-                    "device name (case sensitive).")
-    public List<String> device;
+    @ArgGroup(heading = "Output format:%n",
+            exclusive = true)
+    public FormatOptions format = new FormatOptions();
 
-    @Option(names = "--xdevice",
-            split = ",",
-            description = "Exclude specific devices, specified using either the numeric id or the full " +
-                    "device name (case sensitive).",
-            paramLabel = "device")
-    public List<String> excludeDevice;
-
-    @Option(names = "--app",
-            split = ",",
-            description = "Writes logs for specific apps, specified using the numeric id. If used with " +
-                    "@|bold log|@, the app name (case sensitive) can also be used.")
-    public List<String> app;
-
-    @Option(names = "--xapp",
-            split = ",",
-            description = "Exclude specific apps, specified using the numeric id. If used with " +
-                    "@|bold log|@, the app name (case sensitive) can also be used.",
-            paramLabel = "app")
-    public List<String> excludeApp;
-
-
-    @ArgGroup
-    public Format format = new Format();
-
-    static class Format {
-        @Option(names = {"-r", "--raw"},
-                description = "Write the stream exactly as received from the Hubitat Elevation.")
-        public boolean raw;
-
-        @Option(names = "--csv",
-                description = "Render the stream in CSV format")
-        public boolean csv;
-    }
+    @ArgGroup(heading = "Filters:%n",
+            exclusive = false)
+    public FilterOptions filter = new FilterOptions();
 
     @Option(names = "--kofi",
             description = "Buy the author a coffee.",
@@ -119,7 +84,12 @@ public final class Helog implements Callable<Integer> {
             return 0;
         }
 
-        validateParameters();
+        try {
+            filter.validate(stream, format);
+        } catch (ParameterValidationException e) {
+            throw new ParameterException(commandSpec.commandLine(), ERROR_PREFIX + e.getMessage());
+        }
+
         URI uri = new URI("ws://" + host + "/" + stream.jsonStream.path());
         WebSocketSource source = new WebSocketSource(Ansi.AUTO, uri);
 
@@ -131,76 +101,19 @@ public final class Helog implements Callable<Integer> {
         return 1;
     }
 
-    private void validateParameters() throws ParameterException {
-        if (format.raw) {
-            if (device != null) {
-                throw parameterException("--device cannot be used with --raw");
-            }
-            if (excludeDevice != null) {
-                throw parameterException("--xdevice cannot be used with --raw");
-            }
-            if (app != null) {
-                throw parameterException("--app cannot be used with --raw");
-            }
-            if (excludeApp != null) {
-                throw parameterException("--xapp cannot be used with --raw");
-            }
-        }
-
-        if ((device != null || app != null) && (excludeDevice != null || excludeApp != null)) {
-            throw parameterException("--device or --app cannot be used with --xdevice or --xapp");
-        }
-
-        if (stream == Stream.EVENTS
-                && (!stream(app).allMatch(Strings::isInteger) || !stream(excludeApp).allMatch(Strings::isInteger))) {
-            throw parameterException("Events cannot be filtered by app name. Use the numeric id instead.");
-        }
-    }
-
-    private ParameterException parameterException(String message) {
-        return new ParameterException(commandSpec.commandLine(), ERROR_PREFIX + message);
-    }
-
     private <T> JsonStreamPrinter<T> createJsonStreamPrinter(JsonStream<T> jsonStream) {
-        Predicate<T> filter = createFilter(jsonStream);
+        Predicate<T> predicate = filter.createPredicate(jsonStream);
         if (format.csv) {
             return new JsonStreamPrinter<>(
                     Ansi.AUTO,
                     jsonStream.type(),
-                    filter,
+                    predicate,
                     csvLine(jsonStream.csvHeader()),
                     jsonStream.csvFormatter().andThen(Strings::csvLine));
         } else {
-            return new JsonStreamPrinter<>(Ansi.AUTO, jsonStream.type(), filter, null, jsonStream.formatter());
+            return new JsonStreamPrinter<>(
+                    Ansi.AUTO, jsonStream.type(), predicate, null, jsonStream.formatter());
         }
-    }
-
-    private <T> Predicate<T> createFilter(JsonStream<T> jsonStream) {
-        if (!(isNullOrEmpty(device) && isNullOrEmpty(app))) {
-            Predicate<T> devicePredicate = stream(device).map(jsonStream::device).reduce(e -> false, Predicate::or);
-            Predicate<T> appPredicate = stream(app).map(jsonStream::app).reduce(e -> false, Predicate::or);
-            return devicePredicate.or(appPredicate);
-        } else if (!(isNullOrEmpty(excludeDevice) && isNullOrEmpty(excludeApp))) {
-            Predicate<T> devicePredicate = stream(excludeDevice)
-                    .map(jsonStream::device)
-                    .map(Predicate::not)
-                    .reduce(e -> true, Predicate::and);
-            Predicate<T> appPredicate = stream(excludeApp)
-                    .map(jsonStream::app)
-                    .map(Predicate::not)
-                    .reduce(e -> true, Predicate::and);
-            return devicePredicate.and(appPredicate);
-        } else {
-            return e -> true;
-        }
-    }
-
-    private <T> boolean isNullOrEmpty(List<T> list) {
-        return (list == null || list.isEmpty());
-    }
-
-    private <T> java.util.stream.Stream<T> stream(List<T> list) {
-        return (list == null) ? java.util.stream.Stream.empty() : list.stream();
     }
 
     public static void kofi() {
@@ -235,7 +148,7 @@ public final class Helog implements Callable<Integer> {
     public static final class VersionProvider implements IVersionProvider {
         public String[] getVersion() {
             Package pack = Helog.class.getPackage();
-            return new String[] {
+            return new String[]{
                     pack.getImplementationTitle() + " " + pack.getImplementationVersion()
             };
         }

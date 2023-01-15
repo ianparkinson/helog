@@ -1,12 +1,12 @@
-package com.github.ianparkinson.helog;
+package com.github.ianparkinson.helog.app;
 
-import com.github.ianparkinson.helog.Source.ConnectionFailedException;
+import com.github.ianparkinson.helog.app.Source.ConnectionFailedException;
 import picocli.CommandLine.Help.Ansi;
 
 import java.io.IOException;
 import java.io.Reader;
 
-import static com.github.ianparkinson.helog.ErrorMessage.errorMessage;
+import static com.github.ianparkinson.helog.util.ErrorMessage.errorMessage;
 
 /**
  * Writes text from a {@link Source} out to stdout.

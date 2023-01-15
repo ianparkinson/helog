@@ -1,10 +1,10 @@
-package com.github.ianparkinson.helog;
+package com.github.ianparkinson.helog.util;
 
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-final class Strings {
+public final class Strings {
     private Strings() {
     }
 

@@ -1,6 +1,6 @@
-package com.github.ianparkinson.helog;
+package com.github.ianparkinson.helog.app;
 
-import com.github.ianparkinson.helog.Source.ConnectionFailedException;
+import com.github.ianparkinson.helog.app.Source.ConnectionFailedException;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
@@ -10,7 +10,7 @@ import picocli.CommandLine.Help.Ansi;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import static com.github.ianparkinson.helog.ErrorMessage.errorMessage;
+import static com.github.ianparkinson.helog.util.ErrorMessage.errorMessage;
 
 /**
  * Reads a stream of events in JSON format, and writes them to stdout in a human-readable format.

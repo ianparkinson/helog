@@ -1,4 +1,4 @@
-package com.github.ianparkinson.helog;
+package com.github.ianparkinson.helog.app;
 
 import com.google.gson.reflect.TypeToken;
 
@@ -7,7 +7,7 @@ import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import static com.github.ianparkinson.helog.Strings.emptyIfNull;
+import static com.github.ianparkinson.helog.util.Strings.emptyIfNull;
 import static java.util.Arrays.asList;
 
 /**

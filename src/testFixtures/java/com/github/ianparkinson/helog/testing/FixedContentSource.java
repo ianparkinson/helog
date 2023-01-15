@@ -1,7 +1,7 @@
 package com.github.ianparkinson.helog.testing;
 
-import com.github.ianparkinson.helog.ErrorMessage;
-import com.github.ianparkinson.helog.Source;
+import com.github.ianparkinson.helog.util.ErrorMessage;
+import com.github.ianparkinson.helog.app.Source;
 
 import java.io.Reader;
 import java.io.StringReader;

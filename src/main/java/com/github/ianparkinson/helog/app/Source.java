@@ -1,4 +1,6 @@
-package com.github.ianparkinson.helog;
+package com.github.ianparkinson.helog.app;
+
+import com.github.ianparkinson.helog.util.ErrorMessage;
 
 import java.io.Reader;
 

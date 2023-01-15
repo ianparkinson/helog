@@ -1,6 +1,6 @@
-package com.github.ianparkinson.helog;
+package com.github.ianparkinson.helog.app;
 
-import com.github.ianparkinson.helog.EventsJsonStream.EventEntry;
+import com.github.ianparkinson.helog.app.EventsJsonStream.EventEntry;
 import org.junit.jupiter.api.Test;
 
 import static com.google.common.truth.Truth.assertThat;

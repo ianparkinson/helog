@@ -1,4 +1,4 @@
-package com.github.ianparkinson.helog;
+package com.github.ianparkinson.helog.util;
 
 import picocli.CommandLine.Help.Ansi;
 

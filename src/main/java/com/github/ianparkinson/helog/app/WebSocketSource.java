@@ -1,5 +1,6 @@
-package com.github.ianparkinson.helog;
+package com.github.ianparkinson.helog.app;
 
+import com.github.ianparkinson.helog.util.ErrorMessage;
 import picocli.CommandLine.Help.Ansi;
 
 import java.io.IOException;
@@ -14,7 +15,7 @@ import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-import static com.github.ianparkinson.helog.ErrorMessage.errorMessage;
+import static com.github.ianparkinson.helog.util.ErrorMessage.errorMessage;
 
 /**
  * Connects to a WebSocket and spools the received text via a {@link PipedReader}.

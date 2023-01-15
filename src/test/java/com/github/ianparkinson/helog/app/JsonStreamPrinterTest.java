@@ -1,4 +1,4 @@
-package com.github.ianparkinson.helog;
+package com.github.ianparkinson.helog.app;
 
 import com.github.ianparkinson.helog.testing.FailedConnectionSource;
 import com.github.ianparkinson.helog.testing.FixedContentSource;
@@ -11,7 +11,7 @@ import picocli.CommandLine.Help.Ansi;
 
 import java.util.function.Predicate;
 
-import static com.github.ianparkinson.helog.ErrorMessage.errorMessage;
+import static com.github.ianparkinson.helog.util.ErrorMessage.errorMessage;
 import static com.github.ianparkinson.helog.testing.TestStrings.lines;
 import static com.google.common.truth.Truth.assertThat;
 
