@@ -129,7 +129,6 @@ public final class Helog implements Callable<Integer> {
             return 2;
         } else {
             return new CommandLine(new Helog())
-                    .setCaseInsensitiveEnumValuesAllowed(true)
                     .setTrimQuotes(true)
                     .execute(args);
         }

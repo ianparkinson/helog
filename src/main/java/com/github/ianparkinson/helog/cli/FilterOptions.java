@@ -61,7 +61,8 @@ public class FilterOptions {
     public List<LogLevel> excludeLevel;
 
     public enum LogLevel {
-        ERROR, WARN, INFO, DEBUG, TRACE
+        // Lower-case for use as command-line options
+        error, warn, info, debug, trace
     }
 
     public void validate(Stream stream, FormatOptions formatOptions) throws ParameterValidationException {
@@ -104,7 +105,7 @@ public class FilterOptions {
             throw new ParameterValidationException("--level and --xlevel cannot be used together");
         }
 
-        if (stream == Stream.LOG) {
+        if (stream == Stream.log) {
             if (name != null) {
                 throw new ParameterValidationException("--name cannot be used with log");
             }
@@ -113,7 +114,7 @@ public class FilterOptions {
             }
         }
 
-        if (stream == Stream.EVENTS) {
+        if (stream == Stream.events) {
             if (!stream(app).allMatch(Strings::isInteger) || !stream(excludeApp).allMatch(Strings::isInteger)) {
                 throw new ParameterValidationException(
                         "Events cannot be filtered by app name. Use the numeric id instead.");
@@ -155,9 +156,9 @@ public class FilterOptions {
 
     private <T> Predicate<T> createLevelPredicate(JsonStream<T> jsonStream) {
         if (!isNullOrEmpty(level)) {
-            return anyOf(level, logLevel -> jsonStream.logLevel(logLevel.name().toLowerCase()));
+            return anyOf(level, logLevel -> jsonStream.logLevel(logLevel.name()));
         } else {
-            return noneOf(excludeLevel, logLevel -> jsonStream.logLevel(logLevel.name().toLowerCase()));
+            return noneOf(excludeLevel, logLevel -> jsonStream.logLevel(logLevel.name()));
         }
     }
 

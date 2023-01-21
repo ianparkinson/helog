@@ -8,8 +8,9 @@ import com.github.ianparkinson.helog.app.LogJsonStream;
  * Streams which can be selected at the command line.
  */
 public enum Stream {
-    LOG(new LogJsonStream()),
-    EVENTS(new EventsJsonStream());
+    // Lower-case for use as command-line options
+    log(new LogJsonStream()),
+    events(new EventsJsonStream());
 
     public final JsonStream<?> jsonStream;
 
