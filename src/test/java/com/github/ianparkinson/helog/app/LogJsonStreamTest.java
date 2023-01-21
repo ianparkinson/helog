@@ -4,6 +4,7 @@ import com.github.ianparkinson.helog.app.LogJsonStream.LogEntry;
 import org.junit.jupiter.api.Test;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class LogJsonStreamTest {
 
@@ -97,6 +98,11 @@ class LogJsonStreamTest {
         entry.name = "n";
         entry.id = "42";
         assertThat(logJsonStream.app("n").test(entry)).isFalse();
+    }
+
+    @Test
+    void eventName_notSupported() {
+        assertThrows(UnsupportedOperationException.class, () -> logJsonStream.eventName("foo"));
     }
 
     @Test

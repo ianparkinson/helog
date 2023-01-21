@@ -38,6 +38,11 @@ public final class LogJsonStream implements JsonStream<LogJsonStream.LogEntry> {
     }
 
     @Override
+    public Predicate<LogEntry> eventName(String name) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public Function<LogEntry, String> formatter() {
         return LogJsonStream::format;
     }

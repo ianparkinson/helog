@@ -37,6 +37,13 @@ public interface JsonStream<T> {
      */
     Predicate<T> app(String app);
 
+    /**
+     * Filter by event name.
+     *
+     * <p>Only supported by {@code eventsocket}.
+     */
+    Predicate<T> eventName(String name);
+
     /** Renders an entry in the stream to a human-readable line of text. */
     Function<T, String> formatter();
 

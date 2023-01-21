@@ -107,7 +107,6 @@ public final class HelogEventsTest {
         assertThat(lines[1]).contains("OtherApp");
     }
 
-
     @Test
     public void filterIncludeApp() {
         webServer.content.add("{ \"source\":\"APP\",\"name\":\"FirstMatch\",\"displayName\" : \"\", " +
@@ -152,6 +151,45 @@ public final class HelogEventsTest {
         assertThat(lines).hasLength(2);
         assertThat(lines[0]).contains("OtherApp");
         assertThat(lines[1]).contains("OtherDevice");
+    }
+
+    @Test
+    public void filterIncludeName() {
+        webServer.content.add("{ \"source\":\"APP\",\"name\":\"Prop1\",\"displayName\" : \"\", " +
+                "\"value\" : \"off\", \"type\" : \"digital\", \"unit\":\"null\",\"deviceId\":0,\"hubId\":0," +
+                "\"installedAppId\":34,\"descriptionText\" : \"FirstMatch\"}");
+        webServer.content.add("{ \"source\":\"APP\",\"name\":\"Prop2\",\"displayName\" : \"\", " +
+                "\"value\" : \"off\", \"type\" : \"digital\", \"unit\":\"null\",\"deviceId\":0,\"hubId\":0," +
+                "\"installedAppId\":35,\"descriptionText\" : \"NoMatch\"}");
+        webServer.content.add("{ \"source\":\"APP\",\"name\":\"Prop3\",\"displayName\" : \"\", " +
+                "\"value\" : \"off\", \"type\" : \"digital\", \"unit\":\"null\",\"deviceId\":0,\"hubId\":0," +
+                "\"installedAppId\":36,\"descriptionText\" : \"SecondMatch\"}");
+
+        Helog.run("events", webServer.getHostAndPort(), "--name=Prop1,Prop3");
+
+        String[] lines = splitLines(out.getContent());
+        assertThat(lines).hasLength(2);
+        assertThat(lines[0]).contains("FirstMatch");
+        assertThat(lines[1]).contains("SecondMatch");
+    }
+
+    @Test
+    public void filterExcludeName() {
+        webServer.content.add("{ \"source\":\"APP\",\"name\":\"Prop1\",\"displayName\" : \"\", " +
+                "\"value\" : \"off\", \"type\" : \"digital\", \"unit\":\"null\",\"deviceId\":0,\"hubId\":0," +
+                "\"installedAppId\":34,\"descriptionText\" : \"FirstMatch\"}");
+        webServer.content.add("{ \"source\":\"APP\",\"name\":\"Prop2\",\"displayName\" : \"\", " +
+                "\"value\" : \"off\", \"type\" : \"digital\", \"unit\":\"null\",\"deviceId\":0,\"hubId\":0," +
+                "\"installedAppId\":35,\"descriptionText\" : \"NoMatch\"}");
+        webServer.content.add("{ \"source\":\"APP\",\"name\":\"Prop3\",\"displayName\" : \"\", " +
+                "\"value\" : \"off\", \"type\" : \"digital\", \"unit\":\"null\",\"deviceId\":0,\"hubId\":0," +
+                "\"installedAppId\":36,\"descriptionText\" : \"SecondMatch\"}");
+
+        Helog.run("events", webServer.getHostAndPort(), "--xname=Prop1,Prop3");
+
+        String[] lines = splitLines(out.getContent());
+        assertThat(lines).hasLength(1);
+        assertThat(lines[0]).contains("NoMatch");
     }
 
     @Test

@@ -88,6 +88,20 @@ class EventsJsonStreamTest {
     }
 
     @Test
+    void eventName_matches() {
+        EventEntry entry = new EventEntry();
+        entry.name = "name";
+        assertThat(eventsJsonStream.eventName("name").test(entry)).isTrue();
+    }
+
+    @Test
+    void eventName_noMatch() {
+        EventEntry entry = new EventEntry();
+        entry.name = "name";
+        assertThat(eventsJsonStream.eventName("other").test(entry)).isFalse();
+    }
+
+    @Test
     void formatterDevice() {
         EventEntry entry = new EventEntry();
         entry.source = "DEVICE";
