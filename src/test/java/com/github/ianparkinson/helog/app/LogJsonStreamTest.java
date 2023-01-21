@@ -106,6 +106,20 @@ class LogJsonStreamTest {
     }
 
     @Test
+    void logLevel_matches() {
+        LogEntry entry = new LogEntry();
+        entry.level = "debug";
+        assertThat(logJsonStream.logLevel("debug").test(entry)).isTrue();
+    }
+
+    @Test
+    void logLevel_noMatch() {
+        LogEntry entry = new LogEntry();
+        entry.level = "error";
+        assertThat(logJsonStream.logLevel("debug").test(entry)).isFalse();
+    }
+
+    @Test
     void formatter() {
         LogEntry entry = new LogEntry();
         entry.name = "n";

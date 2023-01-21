@@ -45,8 +45,24 @@ public class FilterOptions {
 
     @Option(names = "--xname",
             split = ",",
-            description = "Exclude events with the given name. Case sensitive.")
+            description = "Exclude events with the given name. Case sensitive.",
+            paramLabel = "name")
     public List<String> excludeName;
+
+    @Option(names = "--level",
+            split = ",",
+            description = "Include logs with the given level: error, warn, info, debug or trace.")
+    public List<LogLevel> level;
+
+    @Option(names = "--xlevel",
+            split = ",",
+            description = "Exclude logs with the given level: error, warn, info, debug or trace.",
+            paramLabel = "level")
+    public List<LogLevel> excludeLevel;
+
+    public enum LogLevel {
+        ERROR, WARN, INFO, DEBUG, TRACE
+    }
 
     public void validate(Stream stream, FormatOptions formatOptions) throws ParameterValidationException {
         if (formatOptions.raw) {
@@ -68,6 +84,12 @@ public class FilterOptions {
             if (excludeName != null) {
                 throw new ParameterValidationException("--xname cannot be used with --raw");
             }
+            if (level != null) {
+                throw new ParameterValidationException("--level cannot be used with --raw");
+            }
+            if (excludeLevel != null) {
+                throw new ParameterValidationException("--xlevel cannot be used with --raw");
+            }
         }
 
         if ((device != null || app != null) && (excludeDevice != null || excludeApp != null)) {
@@ -76,6 +98,10 @@ public class FilterOptions {
 
         if (name != null && excludeName != null) {
             throw new ParameterValidationException("--name and --xname cannot be used together");
+        }
+
+        if (level != null && excludeLevel != null) {
+            throw new ParameterValidationException("--level and --xlevel cannot be used together");
         }
 
         if (stream == Stream.LOG) {
@@ -87,19 +113,27 @@ public class FilterOptions {
             }
         }
 
-        if (stream == Stream.EVENTS
-                && (!stream(app).allMatch(Strings::isInteger) || !stream(excludeApp).allMatch(Strings::isInteger))) {
-            throw new ParameterValidationException(
-                    "Events cannot be filtered by app name. Use the numeric id instead.");
+        if (stream == Stream.EVENTS) {
+            if (!stream(app).allMatch(Strings::isInteger) || !stream(excludeApp).allMatch(Strings::isInteger)) {
+                throw new ParameterValidationException(
+                        "Events cannot be filtered by app name. Use the numeric id instead.");
+            }
+            if (level != null) {
+                throw new ParameterValidationException("--level cannot be used with events");
+            }
+            if (excludeLevel != null) {
+                throw new ParameterValidationException("--xlevel cannot be used with events");
+            }
         }
     }
 
     public <T> Predicate<T> createPredicate(JsonStream<T> jsonStream) {
         return createSourcePredicate(jsonStream)
-                .and(createNamePredicate(jsonStream));
+                .and(createNamePredicate(jsonStream))
+                .and(createLevelPredicate(jsonStream));
     }
 
-    public <T> Predicate<T> createSourcePredicate(JsonStream<T> jsonStream) {
+    private <T> Predicate<T> createSourcePredicate(JsonStream<T> jsonStream) {
         if (!(isNullOrEmpty(device) && isNullOrEmpty(app))) {
             Predicate<T> devicePredicate = anyOf(device, jsonStream::device);
             Predicate<T> appPredicate = anyOf(app, jsonStream::app);
@@ -111,11 +145,19 @@ public class FilterOptions {
         }
     }
 
-    public <T> Predicate<T> createNamePredicate(JsonStream<T> jsonStream) {
+    private <T> Predicate<T> createNamePredicate(JsonStream<T> jsonStream) {
         if (!isNullOrEmpty(name)) {
             return anyOf(name, jsonStream::eventName);
         } else {
             return noneOf(excludeName, jsonStream::eventName);
+        }
+    }
+
+    private <T> Predicate<T> createLevelPredicate(JsonStream<T> jsonStream) {
+        if (!isNullOrEmpty(level)) {
+            return anyOf(level, logLevel -> jsonStream.logLevel(logLevel.name().toLowerCase()));
+        } else {
+            return noneOf(excludeLevel, logLevel -> jsonStream.logLevel(logLevel.name().toLowerCase()));
         }
     }
 

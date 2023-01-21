@@ -125,6 +125,35 @@ public final class HelogLogTest {
     }
 
     @Test
+    public void filterIncludeLogLevel() {
+        webServer.content.add("{\"name\":\"FirstMatch\",\"msg\":\"msg\",\"id\":34, " +
+                "\"time\":\"2022-11-05 16:25:52.729\",\"type\":\"app\",\"level\":\"info\"}");
+        webServer.content.add("{\"name\":\"NoMatch\",\"msg\":\"msg\",\"id\":35, " +
+                "\"time\":\"2022-11-05 16:25:52.729\",\"type\":\"app\",\"level\":\"error\"}");
+        webServer.content.add("{\"name\":\"SecondMatch\",\"msg\":\"msg\",\"id\":36, " +
+                "\"time\":\"2022-11-05 16:25:52.729\",\"type\":\"app\",\"level\":\"debug\"}");
+        Helog.run("log", webServer.getHostAndPort(), "--level=info,debug");
+        String[] lines = splitLines(out.getContent());
+        assertThat(lines).hasLength(2);
+        assertThat(lines[0]).contains("FirstMatch");
+        assertThat(lines[1]).contains("SecondMatch");
+    }
+
+    @Test
+    public void filterExcludeLogLevel() {
+        webServer.content.add("{\"name\":\"FirstMatch\",\"msg\":\"msg\",\"id\":34, " +
+                "\"time\":\"2022-11-05 16:25:52.729\",\"type\":\"app\",\"level\":\"info\"}");
+        webServer.content.add("{\"name\":\"NoMatch\",\"msg\":\"msg\",\"id\":35, " +
+                "\"time\":\"2022-11-05 16:25:52.729\",\"type\":\"app\",\"level\":\"error\"}");
+        webServer.content.add("{\"name\":\"SecondMatch\",\"msg\":\"msg\",\"id\":36, " +
+                "\"time\":\"2022-11-05 16:25:52.729\",\"type\":\"app\",\"level\":\"debug\"}");
+        Helog.run("log", webServer.getHostAndPort(), "--xlevel=info,debug");
+        String[] lines = splitLines(out.getContent());
+        assertThat(lines).hasLength(1);
+        assertThat(lines[0]).contains("NoMatch");
+    }
+
+    @Test
     public void writesInCsvFormat() {
         webServer.content.add("{\"name\":\"Christmas Tree\",\"msg\":\"setSysinfo: [led:off]\",\"id\":34, " +
                 "\"time\":\"2022-11-05 16:25:52.729\",\"type\":\"dev\",\"level\":\"info\"}");

@@ -43,6 +43,11 @@ public final class EventsJsonStream implements JsonStream<EventsJsonStream.Event
     }
 
     @Override
+    public Predicate<EventEntry> logLevel(String level) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public Function<EventEntry, String> formatter() {
         return EventsJsonStream::format;
     }

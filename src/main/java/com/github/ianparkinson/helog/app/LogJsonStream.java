@@ -43,6 +43,11 @@ public final class LogJsonStream implements JsonStream<LogJsonStream.LogEntry> {
     }
 
     @Override
+    public Predicate<LogEntry> logLevel(String level) {
+        return entry -> Objects.equals(entry.level, level);
+    }
+
+    @Override
     public Function<LogEntry, String> formatter() {
         return LogJsonStream::format;
     }

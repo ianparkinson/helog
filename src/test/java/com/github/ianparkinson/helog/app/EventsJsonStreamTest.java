@@ -4,6 +4,7 @@ import com.github.ianparkinson.helog.app.EventsJsonStream.EventEntry;
 import org.junit.jupiter.api.Test;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class EventsJsonStreamTest {
     private final EventsJsonStream eventsJsonStream = new EventsJsonStream();
@@ -99,6 +100,11 @@ class EventsJsonStreamTest {
         EventEntry entry = new EventEntry();
         entry.name = "name";
         assertThat(eventsJsonStream.eventName("other").test(entry)).isFalse();
+    }
+
+    @Test
+    void logLevel_notSupported() {
+        assertThrows(UnsupportedOperationException.class, () -> eventsJsonStream.logLevel("foo"));
     }
 
     @Test

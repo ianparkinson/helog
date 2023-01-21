@@ -44,6 +44,13 @@ public interface JsonStream<T> {
      */
     Predicate<T> eventName(String name);
 
+    /**
+     * Filter by log level.
+     *
+     * <p>Only supported by {@code logsocket}.</p>
+     */
+    Predicate<T> logLevel(String level);
+
     /** Renders an entry in the stream to a human-readable line of text. */
     Function<T, String> formatter();
 
