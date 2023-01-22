@@ -67,64 +67,41 @@ public class FilterOptions {
 
     public void validate(Stream stream, FormatOptions formatOptions) throws ParameterValidationException {
         if (formatOptions.raw) {
-            if (device != null) {
-                throw new ParameterValidationException("--device cannot be used with --raw");
-            }
-            if (excludeDevice != null) {
-                throw new ParameterValidationException("--xdevice cannot be used with --raw");
-            }
-            if (app != null) {
-                throw new ParameterValidationException("--app cannot be used with --raw");
-            }
-            if (excludeApp != null) {
-                throw new ParameterValidationException("--xapp cannot be used with --raw");
-            }
-            if (name != null) {
-                throw new ParameterValidationException("--name cannot be used with --raw");
-            }
-            if (excludeName != null) {
-                throw new ParameterValidationException("--xname cannot be used with --raw");
-            }
-            if (level != null) {
-                throw new ParameterValidationException("--level cannot be used with --raw");
-            }
-            if (excludeLevel != null) {
-                throw new ParameterValidationException("--xlevel cannot be used with --raw");
-            }
+            enforce(device == null, "--device cannot be used with --raw");
+            enforce(excludeDevice == null, "--xdevice cannot be used with --raw");
+            enforce(app == null, "--app cannot be used with --raw");
+            enforce(excludeApp == null, "--xapp cannot be used with --raw");
+            enforce(name == null, "--name cannot be used with --raw");
+            enforce(excludeName == null, "--xname cannot be used with --raw");
+            enforce(level == null, "--level cannot be used with --raw");
+            enforce(excludeLevel == null, "--xlevel cannot be used with --raw");
         }
 
-        if ((device != null || app != null) && (excludeDevice != null || excludeApp != null)) {
-            throw new ParameterValidationException("--device or --app cannot be used with --xdevice or --xapp");
-        }
-
-        if (name != null && excludeName != null) {
-            throw new ParameterValidationException("--name and --xname cannot be used together");
-        }
-
-        if (level != null && excludeLevel != null) {
-            throw new ParameterValidationException("--level and --xlevel cannot be used together");
-        }
+        boolean sourceFilteredInclusively = device != null || app != null;
+        boolean sourceFilteredExclusively = excludeDevice != null || excludeApp != null;
+        enforce(!(sourceFilteredInclusively && sourceFilteredExclusively),
+                "--device or --app cannot be used with --xdevice or --xapp");
+        enforce(!(name != null && excludeName != null), "--name and --xname cannot be used together");
+        enforce(!(level != null && excludeLevel != null), "--level and --xlevel cannot be used together");
 
         if (stream == Stream.log) {
-            if (name != null) {
-                throw new ParameterValidationException("--name cannot be used with log");
-            }
-            if (excludeName != null) {
-                throw new ParameterValidationException("--xname cannot be used with log");
-            }
+            enforce(name == null, "--name cannot be used with log");
+            enforce(excludeName == null, "--xname cannot be used with log");
         }
 
         if (stream == Stream.events) {
-            if (!stream(app).allMatch(Strings::isInteger) || !stream(excludeApp).allMatch(Strings::isInteger)) {
-                throw new ParameterValidationException(
-                        "Events cannot be filtered by app name. Use the numeric id instead.");
-            }
-            if (level != null) {
-                throw new ParameterValidationException("--level cannot be used with events");
-            }
-            if (excludeLevel != null) {
-                throw new ParameterValidationException("--xlevel cannot be used with events");
-            }
+            enforce(stream(app).allMatch(Strings::isInteger),
+                    "Events cannot be filtered by app name. Use the numeric id instead.");
+            enforce(stream(excludeApp).allMatch(Strings::isInteger),
+                    "Events cannot be filtered by app name. Use the numeric id instead.");
+            enforce(level == null, "--level cannot be used with events");
+            enforce(excludeLevel == null, "--xlevel cannot be used with events");
+        }
+    }
+
+    private void enforce(boolean condition, String message) throws ParameterValidationException {
+        if (!condition) {
+            throw new ParameterValidationException(message);
         }
     }
 
