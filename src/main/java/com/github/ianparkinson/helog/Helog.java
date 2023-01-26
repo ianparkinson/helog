@@ -33,7 +33,6 @@ import static com.github.ianparkinson.helog.util.Strings.csvLine;
                 "  @|bold helog log|@ @|yellow <host>|@",
                 "  @|bold helog events|@ @|yellow <host>|@"
         },
-        mixinStandardHelpOptions = true,
         versionProvider = Helog.VersionProvider.class
 )
 public final class Helog implements Callable<Integer> {
