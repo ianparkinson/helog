@@ -14,50 +14,45 @@ import java.util.function.Predicate;
 public class FilterOptions {
     @Option(names = "--device",
             split = ",",
-            description = "Writes logs for specific devices, specified using either the numeric id or the full " +
+            description = "Include (or exclude) specific devices, specified using either the numeric id or the full " +
                     "device name (case sensitive).")
     public List<String> device;
 
     @Option(names = "--xdevice",
             split = ",",
-            description = "Exclude specific devices, specified using either the numeric id or the full " +
-                    "device name (case sensitive).",
-            paramLabel = "device")
+            hidden = true)
     public List<String> excludeDevice;
 
     @Option(names = "--app",
             split = ",",
-            description = "Writes logs for specific apps, specified using the numeric id. If used with " +
+            description = "Include (or exclude) specific apps, specified using the numeric id. If used with " +
                     "@|bold log|@, the app name (case sensitive) can also be used.")
     public List<String> app;
 
     @Option(names = "--xapp",
             split = ",",
-            description = "Exclude specific apps, specified using the numeric id. If used with " +
-                    "@|bold log|@, the app name (case sensitive) can also be used.",
-            paramLabel = "app")
+            hidden = true)
     public List<String> excludeApp;
 
     @Option(names = "--name",
             split = ",",
-            description = "Include events with the given name. Case sensitive.")
+            description = "Include (or exclude) events with the given name. Case sensitive.")
     public List<String> name;
 
     @Option(names = "--xname",
             split = ",",
-            description = "Exclude events with the given name. Case sensitive.",
-            paramLabel = "name")
+            hidden = true)
     public List<String> excludeName;
 
     @Option(names = "--level",
             split = ",",
-            description = "Include logs with the given level: error, warn, info, debug or trace.")
+            description = "Include (or exclude) log entries with the given level: @|bold error|@, @|bold warn|@," +
+                    "@|bold info|@, @|bold debug|@ or @|bold trace|@.")
     public List<LogLevel> level;
 
     @Option(names = "--xlevel",
             split = ",",
-            description = "Exclude logs with the given level: error, warn, info, debug or trace.",
-            paramLabel = "level")
+            hidden = true)
     public List<LogLevel> excludeLevel;
 
     public enum LogLevel {
@@ -172,5 +167,20 @@ public class FilterOptions {
 
     private <T> boolean isNullOrEmpty(List<T> list) {
         return (list == null || list.isEmpty());
+    }
+
+    public static String getExclusiveAlternative(String name) {
+        switch (name) {
+            case "--app":
+                return "--xapp";
+            case "--device":
+                return "--xdevice";
+            case "--level":
+                return "--xlevel";
+            case "--name":
+                return "--xname";
+            default:
+                return null;
+        }
     }
 }

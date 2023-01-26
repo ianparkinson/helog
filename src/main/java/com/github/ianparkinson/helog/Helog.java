@@ -11,6 +11,7 @@ import com.github.ianparkinson.helog.cli.Stream;
 import com.github.ianparkinson.helog.util.Strings;
 import picocli.CommandLine;
 import picocli.CommandLine.ArgGroup;
+import picocli.CommandLine.Help;
 import picocli.CommandLine.Help.Ansi;
 import picocli.CommandLine.IVersionProvider;
 import picocli.CommandLine.Option;
@@ -64,18 +65,18 @@ public final class Helog implements Callable<Integer> {
         }
     }
 
-    @ArgGroup(heading = "Output format:%n",
+    @Option(names = "--kofi",
+            description = "Buy the author a coffee.",
+            help = true)
+    public boolean kofi;
+
+    @ArgGroup(heading = "%nOutput format:%n",
             exclusive = true)
     public FormatOptions format = new FormatOptions();
 
     @ArgGroup(heading = "Filters:%n",
             exclusive = false)
     public FilterOptions filter = new FilterOptions();
-
-    @Option(names = "--kofi",
-            description = "Buy the author a coffee.",
-            help = true)
-    public boolean kofi;
 
     @Override
     public Integer call() throws URISyntaxException {
@@ -122,15 +123,15 @@ public final class Helog implements Callable<Integer> {
     }
 
     public static int run(String... args) {
+        CommandLine commandLine = new CommandLine(new Helog()).setTrimQuotes(true).setHelpFactory(new HelpFactory());
+
         if (args.length == 0) {
             // If called without any arguments, Picocli writes an error to stderr before writing usage. Bypass the
             // error, just print usage.
-            CommandLine.usage(new Helog(), System.err);
+            commandLine.usage(System.err);
             return 2;
         } else {
-            return new CommandLine(new Helog())
-                    .setTrimQuotes(true)
-                    .execute(args);
+            return commandLine.execute(args);
         }
     }
 
@@ -149,6 +150,48 @@ public final class Helog implements Callable<Integer> {
             Package pack = Helog.class.getPackage();
             return new String[]{
                     pack.getImplementationTitle() + " " + pack.getImplementationVersion()
+            };
+        }
+    }
+
+    /**
+     * Customized renderer for help options, which tweaks the format for filter options.
+     *
+     * <p>Filter options can be used in either an "inclusive" or "exclusive" form; treated by Picocli as separate
+     * options, but rendered as a single option with alternative forms to reduce duplication in the help text.
+     * Where appropriate, this {@link HelpFactory} renders the option synopsis in the format:
+     * <pre>
+     *   --device=<device>[,<device>...], --xdevice=<device>[,<device>...]
+     * </pre>
+     */
+    private static class HelpFactory implements CommandLine.IHelpFactory {
+        @Override
+        public Help create(
+                CommandLine.Model.CommandSpec commandSpec,
+                Help.ColorScheme colorScheme) {
+            return new Help(commandSpec, colorScheme) {
+                @Override
+                public IOptionRenderer createDefaultOptionRenderer() {
+                    IOptionRenderer base = super.createDefaultOptionRenderer();
+                    return (option, renderer, scheme) -> {
+                        Ansi.Text[][] out = base.render(option, renderer, scheme);
+                        if (option.names().length != 1) {
+                            return out;
+                        }
+
+                        String exclusive = FilterOptions.getExclusiveAlternative(option.names()[0]);
+                        if (exclusive != null) {
+                            Ansi.Text paramLabelText = renderer.renderParameterLabel(
+                                    option, scheme.ansi(), scheme.optionParamStyles());
+                            out[0][3] = scheme.optionText(option.names()[0])
+                                    .concat(paramLabelText)
+                                    .concat(", ")
+                                    .concat(scheme.optionText(exclusive))
+                                    .concat(paramLabelText);
+                        }
+                        return out;
+                    };
+                }
             };
         }
     }
