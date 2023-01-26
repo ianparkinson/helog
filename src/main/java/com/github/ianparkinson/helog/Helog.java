@@ -65,12 +65,7 @@ public final class Helog implements Callable<Integer> {
         }
     }
 
-    @Option(names = "--kofi",
-            description = "Buy the author a coffee.",
-            help = true)
-    public boolean kofi;
-
-    @ArgGroup(heading = "%nOutput format:%n",
+    @ArgGroup(heading = "Output format:%n",
             exclusive = true)
     public FormatOptions format = new FormatOptions();
 
@@ -78,9 +73,29 @@ public final class Helog implements Callable<Integer> {
             exclusive = false)
     public FilterOptions filter = new FilterOptions();
 
+    @ArgGroup(heading = "Help:%n")
+    public HelpOptions helpOptions = new HelpOptions();
+
+    public static class HelpOptions {
+        @Option(names = { "-h", "--help" },
+                usageHelp = true,
+                description = "Show this help message and exit.")
+        public boolean help;
+
+        @Option(names = { "-v", "--version" },
+                versionHelp = true,
+                description = "Print version information and exit.")
+        public boolean version;
+
+        @Option(names = "--kofi",
+                description = "Buy the author a coffee.",
+                help = true)
+        public boolean kofi;
+    }
+
     @Override
     public Integer call() throws URISyntaxException {
-        if (kofi) {
+        if (helpOptions.kofi) {
             kofi();
             return 0;
         }
