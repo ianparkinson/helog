@@ -1,6 +1,7 @@
 package com.github.ianparkinson.helog;
 
 import com.github.ianparkinson.helog.app.JsonStream;
+import com.github.ianparkinson.helog.app.JsonStreamFormatter;
 import com.github.ianparkinson.helog.app.JsonStreamPrinter;
 import com.github.ianparkinson.helog.app.RawPrinter;
 import com.github.ianparkinson.helog.app.WebSocketSource;
@@ -20,6 +21,8 @@ import picocli.CommandLine.Parameters;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.Clock;
+import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.function.Predicate;
 
@@ -119,15 +122,17 @@ public final class Helog implements Callable<Integer> {
     private <T> JsonStreamPrinter<T> createJsonStreamPrinter(JsonStream<T> jsonStream) {
         Predicate<T> predicate = filter.createPredicate(jsonStream);
         if (format.csv) {
+            JsonStreamFormatter<T, List<String>> csvFormatter = jsonStream.csvFormatter();
             return new JsonStreamPrinter<>(
+                    Clock.systemDefaultZone(),
                     Ansi.AUTO,
                     jsonStream.type(),
                     predicate,
                     csvLine(jsonStream.csvHeader()),
-                    jsonStream.csvFormatter().andThen(Strings::csvLine));
+                    (dateTime, event) -> csvLine(csvFormatter.format(dateTime, event)));
         } else {
             return new JsonStreamPrinter<>(
-                    Ansi.AUTO, jsonStream.type(), predicate, null, jsonStream.formatter());
+                    Clock.systemDefaultZone(), Ansi.AUTO, jsonStream.type(), predicate, null, jsonStream.formatter());
         }
     }
 

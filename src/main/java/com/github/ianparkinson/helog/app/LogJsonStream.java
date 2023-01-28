@@ -2,9 +2,9 @@ package com.github.ianparkinson.helog.app;
 
 import com.google.gson.reflect.TypeToken;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Function;
 import java.util.function.Predicate;
 
 import static com.github.ianparkinson.helog.util.Strings.emptyIfNull;
@@ -48,11 +48,11 @@ public final class LogJsonStream implements JsonStream<LogJsonStream.LogEntry> {
     }
 
     @Override
-    public Function<LogEntry, String> formatter() {
+    public JsonStreamFormatter<LogEntry, String> formatter() {
         return LogJsonStream::format;
     }
 
-    private static String format(LogEntry entry) {
+    private static String format(ZonedDateTime dateTime, LogEntry entry) {
         return String.format("%s %-5s  %s %s %s  %s",
                 emptyIfNull(entry.time),
                 emptyIfNull(entry.level),
@@ -68,8 +68,8 @@ public final class LogJsonStream implements JsonStream<LogJsonStream.LogEntry> {
     }
 
     @Override
-    public Function<LogEntry, List<String>> csvFormatter() {
-        return entry -> asList(
+    public JsonStreamFormatter<LogEntry, List<String>> csvFormatter() {
+        return (dateTime, entry) -> asList(
                 emptyIfNull(entry.name),
                 emptyIfNull(entry.msg),
                 emptyIfNull(entry.id),

@@ -2,9 +2,9 @@ package com.github.ianparkinson.helog.app;
 
 import com.google.gson.reflect.TypeToken;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -48,11 +48,11 @@ public final class EventsJsonStream implements JsonStream<EventsJsonStream.Event
     }
 
     @Override
-    public Function<EventEntry, String> formatter() {
+    public JsonStreamFormatter<EventEntry, String> formatter() {
         return EventsJsonStream::format;
     }
 
-    private static String format(EventEntry entry) {
+    private static String format(ZonedDateTime dateTime, EventEntry entry) {
         List<String> prefixParts = Stream.of(
                 String.format("%-6s", emptyIfNull(entry.source)),
                 emptyIfNullOrZero(entry.deviceId),
@@ -91,8 +91,8 @@ public final class EventsJsonStream implements JsonStream<EventsJsonStream.Event
     }
 
     @Override
-    public Function<EventEntry, List<String>> csvFormatter() {
-        return entry -> asList(
+    public JsonStreamFormatter<EventEntry, List<String>> csvFormatter() {
+        return (zonedDateTime, entry) -> asList(
                 emptyIfNull(entry.source),
                 emptyIfNull(entry.name),
                 emptyIfNull(entry.displayName),

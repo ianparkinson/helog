@@ -3,10 +3,15 @@ package com.github.ianparkinson.helog.app;
 import com.github.ianparkinson.helog.app.EventsJsonStream.EventEntry;
 import org.junit.jupiter.api.Test;
 
+import java.time.ZonedDateTime;
+
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class EventsJsonStreamTest {
+
+    private static final ZonedDateTime dateTime = ZonedDateTime.parse("2023-01-28T13:00:00Z");
+
     private final EventsJsonStream eventsJsonStream = new EventsJsonStream();
 
     @Test
@@ -121,7 +126,7 @@ class EventsJsonStreamTest {
         entry.installedAppId = "0";
         entry.descriptionText= "dt";
 
-        assertThat(eventsJsonStream.formatter().apply(entry)).isEqualTo("DEVICE 1 dn: n v u dt");
+        assertThat(eventsJsonStream.formatter().format(dateTime, entry)).isEqualTo("DEVICE 1 dn: n v u dt");
     }
 
     @Test
@@ -138,7 +143,7 @@ class EventsJsonStreamTest {
         entry.installedAppId = "3";
         entry.descriptionText= "dt";
 
-        assertThat(eventsJsonStream.formatter().apply(entry)).isEqualTo("APP    3 dn: n v u dt");
+        assertThat(eventsJsonStream.formatter().format(dateTime, entry)).isEqualTo("APP    3 dn: n v u dt");
     }
 
     @Test
@@ -155,7 +160,7 @@ class EventsJsonStreamTest {
         entry.installedAppId = "3";
         entry.descriptionText= "dt";
 
-        assertThat(eventsJsonStream.formatter().apply(entry)).isEqualTo("???    1 3 dn: n v u dt");
+        assertThat(eventsJsonStream.formatter().format(dateTime, entry)).isEqualTo("???    1 3 dn: n v u dt");
     }
 
     @Test
@@ -172,7 +177,7 @@ class EventsJsonStreamTest {
         entry.installedAppId = "3";
         entry.descriptionText= "dt";
 
-        assertThat(eventsJsonStream.csvFormatter().apply(entry)).containsExactly(
+        assertThat(eventsJsonStream.csvFormatter().format(dateTime, entry)).containsExactly(
                 "s", "n", "dn", "v", "t", "u", "1", "2", "3", "dt"
         ).inOrder();
     }

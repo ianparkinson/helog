@@ -9,6 +9,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import picocli.CommandLine.Help.Ansi;
 
+import java.time.Clock;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.function.Predicate;
 
 import static com.github.ianparkinson.helog.util.ErrorMessage.errorMessage;
@@ -16,17 +19,22 @@ import static com.github.ianparkinson.helog.testing.TestStrings.lines;
 import static com.google.common.truth.Truth.assertThat;
 
 public final class JsonStreamPrinterTest {
+
+    private static final String timeString = "2023-01-28T13:00Z";
+
     @RegisterExtension
     private final StdOutExtension out = new StdOutExtension();
     @RegisterExtension
     private final StdErrExtension err = new StdErrExtension();
+
+    private final Clock clock = Clock.fixed(ZonedDateTime.parse(timeString).toInstant(), ZoneId.of("Z"));
 
     @Test
     public void formatsEntry() {
         String content = "{\"name\": \"foo\", \"value\": 42}";
         jsonStreamPrinter().run(new FixedContentSource(content));
 
-        assertThat(out.getContent()).isEqualTo(lines("foo 42"));
+        assertThat(out.getContent()).isEqualTo(lines(timeString + " foo 42"));
     }
 
     @Test
@@ -34,7 +42,7 @@ public final class JsonStreamPrinterTest {
         String content = "{\"name\": \"foo\", \"value\": 42}{\"name\": \"bar\", \"value\": 23}";
         jsonStreamPrinter().run(new FixedContentSource(content));
 
-        assertThat(out.getContent()).isEqualTo(lines("foo 42", "bar 23"));
+        assertThat(out.getContent()).isEqualTo(lines(timeString + " foo 42", timeString + " bar 23"));
     }
 
     @Test
@@ -51,7 +59,7 @@ public final class JsonStreamPrinterTest {
                 + "{\"name\": \"baz\", \"value\": 42}";
         jsonStreamPrinter(e -> e.value == 42).run(new FixedContentSource(content));
 
-        assertThat(out.getContent()).isEqualTo(lines("foo 42", "baz 42"));
+        assertThat(out.getContent()).isEqualTo(lines(timeString + " foo 42", timeString + " baz 42"));
     }
 
     @Test
@@ -70,7 +78,7 @@ public final class JsonStreamPrinterTest {
                         "{\"name\": \"foo\", \"value\": 42}";
         jsonStreamPrinter().run(new FixedContentSource(content));
 
-        assertThat(out.getContent()).isEqualTo(lines("foo 42"));
+        assertThat(out.getContent()).isEqualTo(lines(timeString + " foo 42"));
         assertThat(err.getContent()).startsWith("Malformed JSON");
     }
 
@@ -86,7 +94,7 @@ public final class JsonStreamPrinterTest {
         String header = "Header";
         String content = "{\"name\": \"foo\", \"value\": 42}";
         jsonStreamPrinter(header).run(new FixedContentSource(content));
-        assertThat(out.getContent()).isEqualTo(lines(header, "foo 42"));
+        assertThat(out.getContent()).isEqualTo(lines(header, timeString + " foo 42"));
     }
 
     @Test
@@ -97,20 +105,20 @@ public final class JsonStreamPrinterTest {
         assertThat(err.getContent()).isEqualTo(lines(error));
     }
 
-    private static JsonStreamPrinter<TestEntry> jsonStreamPrinter(String header, Predicate<TestEntry> filter) {
+    private JsonStreamPrinter<TestEntry> jsonStreamPrinter(String header, Predicate<TestEntry> filter) {
         return new JsonStreamPrinter<>(
-                Ansi.OFF, TypeToken.get(TestEntry.class), filter, header, TestEntry::format);
+                clock, Ansi.OFF, TypeToken.get(TestEntry.class), filter, header, TestEntry::format);
     }
 
-    private static JsonStreamPrinter<TestEntry> jsonStreamPrinter(String header) {
+    private JsonStreamPrinter<TestEntry> jsonStreamPrinter(String header) {
         return jsonStreamPrinter(header, e -> true);
     }
 
-    private static JsonStreamPrinter<TestEntry> jsonStreamPrinter(Predicate<TestEntry> filter) {
+    private JsonStreamPrinter<TestEntry> jsonStreamPrinter(Predicate<TestEntry> filter) {
         return jsonStreamPrinter(null, filter);
     }
 
-    private static JsonStreamPrinter<TestEntry> jsonStreamPrinter() {
+    private JsonStreamPrinter<TestEntry> jsonStreamPrinter() {
         return jsonStreamPrinter(null, e -> true);
     }
 
@@ -118,8 +126,8 @@ public final class JsonStreamPrinterTest {
         public String name;
         public int value;
 
-        public String format() {
-            return String.format("%s %d", name, value);
+        public static String format(ZonedDateTime dateTime, TestEntry entry) {
+            return String.format("%s %s %d", dateTime, entry.name, entry.value);
         }
     }
 }

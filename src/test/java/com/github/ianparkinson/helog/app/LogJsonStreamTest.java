@@ -3,10 +3,14 @@ package com.github.ianparkinson.helog.app;
 import com.github.ianparkinson.helog.app.LogJsonStream.LogEntry;
 import org.junit.jupiter.api.Test;
 
+import java.time.ZonedDateTime;
+
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class LogJsonStreamTest {
+
+    private static final ZonedDateTime dateTime = ZonedDateTime.parse("2023-01-28T13:00:00Z");
 
     private final LogJsonStream logJsonStream = new LogJsonStream();
 
@@ -129,7 +133,7 @@ class LogJsonStreamTest {
         entry.type = "ty";
         entry.level = "l";
 
-        assertThat(logJsonStream.formatter().apply(entry)).isEqualTo("ti l      ty i n  m");
+        assertThat(logJsonStream.formatter().format(dateTime, entry)).isEqualTo("ti l      ty i n  m");
     }
 
     @Test
@@ -142,7 +146,7 @@ class LogJsonStreamTest {
         entry.type = "ty";
         entry.level = "l";
 
-        assertThat(logJsonStream.csvFormatter().apply(entry))
+        assertThat(logJsonStream.csvFormatter().format(dateTime, entry))
                 .containsExactly("n", "m", "i", "ti", "ty", "l").inOrder();
     }
 }

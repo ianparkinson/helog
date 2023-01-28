@@ -1,13 +1,13 @@
 package com.github.ianparkinson.helog.cli;
 
 import com.github.ianparkinson.helog.app.JsonStream;
+import com.github.ianparkinson.helog.app.JsonStreamFormatter;
 import com.github.ianparkinson.helog.cli.FilterOptions.LogLevel;
 import com.google.gson.reflect.TypeToken;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Function;
 import java.util.function.Predicate;
 
 import static com.google.common.truth.Truth.assertThat;
@@ -575,7 +575,7 @@ public class FilterOptionsTest {
         }
 
         @Override
-        public Function<TestEntry, String> formatter() {
+        public JsonStreamFormatter<TestEntry, String> formatter() {
             throw new UnsupportedOperationException();
         }
 
@@ -585,7 +585,7 @@ public class FilterOptionsTest {
         }
 
         @Override
-        public Function<TestEntry, List<String>> csvFormatter() {
+        public JsonStreamFormatter<TestEntry, List<String>> csvFormatter() {
             throw new UnsupportedOperationException();
         }
     }

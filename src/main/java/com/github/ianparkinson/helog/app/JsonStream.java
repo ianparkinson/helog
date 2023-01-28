@@ -3,7 +3,6 @@ package com.github.ianparkinson.helog.app;
 import com.google.gson.reflect.TypeToken;
 
 import java.util.List;
-import java.util.function.Function;
 import java.util.function.Predicate;
 
 /**
@@ -52,11 +51,11 @@ public interface JsonStream<T> {
     Predicate<T> logLevel(String level);
 
     /** Renders an entry in the stream to a human-readable line of text. */
-    Function<T, String> formatter();
+    JsonStreamFormatter<T, String> formatter();
 
     /** A header row, used with CSV format. */
     List<String> csvHeader();
 
     /** Renders an entry as a list of strings for use with CSV format. */
-    Function<T, List<String>> csvFormatter();
+    JsonStreamFormatter<T, List<String>> csvFormatter();
 }

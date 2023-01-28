@@ -7,7 +7,8 @@ import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import picocli.CommandLine.Help.Ansi;
 
-import java.util.function.Function;
+import java.time.Clock;
+import java.time.ZonedDateTime;
 import java.util.function.Predicate;
 
 import static com.github.ianparkinson.helog.util.ErrorMessage.errorMessage;
@@ -28,13 +29,15 @@ import static com.github.ianparkinson.helog.util.ErrorMessage.errorMessage;
 public final class JsonStreamPrinter<T> {
     public static final Gson gson = new Gson();
 
+    private final Clock clock;
     private final Ansi ansi;
     private final TypeToken<T> jsonTypeToken;
     private final Predicate<T> filter;
     private final String header;
-    private final Function<T, String> formatter;
+    private final JsonStreamFormatter<T, String> formatter;
 
     /**
+     * @param clock         Clock for generating local timestamps
      * @param ansi          Colorizes output.
      * @param jsonTypeToken Token for the type used to represent entries in the JSON stream. Passed to Gson to parse
      *                      the streamed JSON.
@@ -42,11 +45,13 @@ public final class JsonStreamPrinter<T> {
      * @param formatter     Transforms the result of parsing JSON to a human-readable String.
      */
     public JsonStreamPrinter(
+            Clock clock,
             Ansi ansi,
             TypeToken<T> jsonTypeToken,
             Predicate<T> filter,
             String header,
-            Function<T, String> formatter) {
+            JsonStreamFormatter<T, String> formatter) {
+        this.clock = clock;
         this.ansi = ansi;
         this.jsonTypeToken = jsonTypeToken;
         this.filter = filter;
@@ -82,7 +87,8 @@ public final class JsonStreamPrinter<T> {
                 T entry = gson.fromJson(jsonReader, jsonTypeToken);
                 if (entry != null) {
                     if (filter.test(entry)) {
-                        System.out.println(formatter.apply(entry));
+                        ZonedDateTime dateTime = clock.instant().atZone(clock.getZone());
+                        System.out.println(formatter.format(dateTime, entry));
                     }
                 } else if (connection.getError() != null) {
                     connection.getError().writeToStderr(ansi);
