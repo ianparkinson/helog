@@ -10,7 +10,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class LogJsonStreamTest {
 
-    private static final ZonedDateTime dateTime = ZonedDateTime.parse("2023-01-28T13:00:00Z");
+    private static final String DATE_TIME_STRING = "2023-01-28T13:00:00.000Z";
+    private static final ZonedDateTime DATE_TIME = ZonedDateTime.parse(DATE_TIME_STRING);
 
     private final LogJsonStream logJsonStream = new LogJsonStream();
 
@@ -133,7 +134,7 @@ class LogJsonStreamTest {
         entry.type = "ty";
         entry.level = "l";
 
-        assertThat(logJsonStream.formatter().format(dateTime, entry)).isEqualTo("ti l      ty i n  m");
+        assertThat(logJsonStream.formatter().format(DATE_TIME, entry)).isEqualTo("ti l      ty i n  m");
     }
 
     @Test
@@ -146,7 +147,7 @@ class LogJsonStreamTest {
         entry.type = "ty";
         entry.level = "l";
 
-        assertThat(logJsonStream.csvFormatter().format(dateTime, entry))
-                .containsExactly("n", "m", "i", "ti", "ty", "l").inOrder();
+        assertThat(logJsonStream.csvFormatter().format(DATE_TIME, entry))
+                .containsExactly(DATE_TIME_STRING, "n", "m", "i", "ti", "ty", "l").inOrder();
     }
 }

@@ -10,7 +10,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class EventsJsonStreamTest {
 
-    private static final ZonedDateTime dateTime = ZonedDateTime.parse("2023-01-28T13:00:00Z");
+    private static final String DATE_TIME_STRING = "2023-01-28T13:00:00.000Z";
+    private static final ZonedDateTime DATE_TIME = ZonedDateTime.parse(DATE_TIME_STRING);
 
     private final EventsJsonStream eventsJsonStream = new EventsJsonStream();
 
@@ -126,7 +127,7 @@ class EventsJsonStreamTest {
         entry.installedAppId = "0";
         entry.descriptionText= "dt";
 
-        assertThat(eventsJsonStream.formatter().format(dateTime, entry)).isEqualTo("DEVICE 1 dn: n v u dt");
+        assertThat(eventsJsonStream.formatter().format(DATE_TIME, entry)).isEqualTo("DEVICE 1 dn: n v u dt");
     }
 
     @Test
@@ -143,7 +144,7 @@ class EventsJsonStreamTest {
         entry.installedAppId = "3";
         entry.descriptionText= "dt";
 
-        assertThat(eventsJsonStream.formatter().format(dateTime, entry)).isEqualTo("APP    3 dn: n v u dt");
+        assertThat(eventsJsonStream.formatter().format(DATE_TIME, entry)).isEqualTo("APP    3 dn: n v u dt");
     }
 
     @Test
@@ -160,7 +161,7 @@ class EventsJsonStreamTest {
         entry.installedAppId = "3";
         entry.descriptionText= "dt";
 
-        assertThat(eventsJsonStream.formatter().format(dateTime, entry)).isEqualTo("???    1 3 dn: n v u dt");
+        assertThat(eventsJsonStream.formatter().format(DATE_TIME, entry)).isEqualTo("???    1 3 dn: n v u dt");
     }
 
     @Test
@@ -177,8 +178,8 @@ class EventsJsonStreamTest {
         entry.installedAppId = "3";
         entry.descriptionText= "dt";
 
-        assertThat(eventsJsonStream.csvFormatter().format(dateTime, entry)).containsExactly(
-                "s", "n", "dn", "v", "t", "u", "1", "2", "3", "dt"
+        assertThat(eventsJsonStream.csvFormatter().format(DATE_TIME, entry)).containsExactly(
+                DATE_TIME_STRING, "s", "n", "dn", "v", "t", "u", "1", "2", "3", "dt"
         ).inOrder();
     }
 }

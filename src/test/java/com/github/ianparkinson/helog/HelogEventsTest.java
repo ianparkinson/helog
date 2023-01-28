@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 import static com.github.ianparkinson.helog.Helog.ERROR_PREFIX;
+import static com.github.ianparkinson.helog.testing.TestStrings.ISO_OFFSET_DATE_TIME_MILLIS_REGEX;
 import static com.github.ianparkinson.helog.testing.TestStrings.lines;
 import static com.github.ianparkinson.helog.testing.TestStrings.splitLines;
 import static com.google.common.truth.Truth.assertThat;
@@ -198,9 +199,12 @@ public final class HelogEventsTest {
                 "\"value\" : \"off\", \"type\" : \"digital\", \"unit\":\"null\",\"deviceId\":34,\"hubId\":0," +
                 "\"installedAppId\":0,\"descriptionText\" : \"null\"}");
         Helog.run("events", webServer.getHostAndPort(), "--csv");
-        assertThat(out.getContent()).isEqualTo(lines(
-                "source,name,displayName,value,type,unit,deviceId,hubId,installedAppId,descriptionText",
-                "DEVICE,switch,Christmas Tree,off,digital,,34,0,0,"));
+        String[] lines = splitLines(out.getContent());
+        assertThat(lines).hasLength(2);
+        assertThat(lines[0]).isEqualTo(
+                "localTime,source,name,displayName,value,type,unit,deviceId,hubId,installedAppId,descriptionText");
+        assertThat(lines[1]).matches(
+                ISO_OFFSET_DATE_TIME_MILLIS_REGEX + ",DEVICE,switch,Christmas Tree,off,digital,,34,0,0,");
     }
 
     @Test

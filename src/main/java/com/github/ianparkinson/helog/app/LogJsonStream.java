@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
 
+import static com.github.ianparkinson.helog.util.DateTimeFormatters.ISO_OFFSET_DATE_TIME_MILLIS;
 import static com.github.ianparkinson.helog.util.Strings.emptyIfNull;
 import static java.util.Arrays.asList;
 
@@ -64,12 +65,13 @@ public final class LogJsonStream implements JsonStream<LogJsonStream.LogEntry> {
 
     @Override
     public List<String> csvHeader() {
-        return asList("name", "msg", "id", "time", "type", "level");
+        return asList("localTime", "name", "msg", "id", "time", "type", "level");
     }
 
     @Override
     public JsonStreamFormatter<LogEntry, List<String>> csvFormatter() {
         return (dateTime, entry) -> asList(
+                ISO_OFFSET_DATE_TIME_MILLIS.format(dateTime),
                 emptyIfNull(entry.name),
                 emptyIfNull(entry.msg),
                 emptyIfNull(entry.id),

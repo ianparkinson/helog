@@ -9,6 +9,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.github.ianparkinson.helog.util.DateTimeFormatters.ISO_OFFSET_DATE_TIME_MILLIS;
 import static com.github.ianparkinson.helog.util.Strings.emptyIfNull;
 import static java.util.Arrays.asList;
 
@@ -78,6 +79,7 @@ public final class EventsJsonStream implements JsonStream<EventsJsonStream.Event
     @Override
     public List<String> csvHeader() {
         return asList(
+                "localTime",
                 "source",
                 "name",
                 "displayName",
@@ -93,6 +95,7 @@ public final class EventsJsonStream implements JsonStream<EventsJsonStream.Event
     @Override
     public JsonStreamFormatter<EventEntry, List<String>> csvFormatter() {
         return (zonedDateTime, entry) -> asList(
+                ISO_OFFSET_DATE_TIME_MILLIS.format(zonedDateTime),
                 emptyIfNull(entry.source),
                 emptyIfNull(entry.name),
                 emptyIfNull(entry.displayName),

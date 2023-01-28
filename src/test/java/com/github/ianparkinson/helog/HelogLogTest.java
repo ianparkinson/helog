@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 import static com.github.ianparkinson.helog.Helog.ERROR_PREFIX;
+import static com.github.ianparkinson.helog.testing.TestStrings.ISO_OFFSET_DATE_TIME_MILLIS_REGEX;
 import static com.github.ianparkinson.helog.testing.TestStrings.lines;
 import static com.github.ianparkinson.helog.testing.TestStrings.splitLines;
 import static com.google.common.truth.Truth.assertThat;
@@ -155,12 +156,14 @@ public final class HelogLogTest {
 
     @Test
     public void writesInCsvFormat() {
-        webServer.content.add("{\"name\":\"Christmas Tree\",\"msg\":\"setSysinfo: [led:off]\",\"id\":34, " +
+        webServer.content.add("{\"name\":\"Christmas Tree\",\"msg\":\"setSysinfo: led:off\",\"id\":34, " +
                 "\"time\":\"2022-11-05 16:25:52.729\",\"type\":\"dev\",\"level\":\"info\"}");
         Helog.run("log", webServer.getHostAndPort(), "--csv");
-        assertThat(out.getContent()).isEqualTo(lines(
-                "name,msg,id,time,type,level",
-                "Christmas Tree,setSysinfo: [led:off],34,2022-11-05 16:25:52.729,dev,info"));
+        String[] lines = splitLines(out.getContent());
+        assertThat(lines).hasLength(2);
+        assertThat(lines[0]).isEqualTo("localTime,name,msg,id,time,type,level");
+        assertThat(lines[1]).matches(ISO_OFFSET_DATE_TIME_MILLIS_REGEX +
+                ",Christmas Tree,setSysinfo: led:off,34,2022-11-05 16:25:52.729,dev,info");
     }
 
     @Test
