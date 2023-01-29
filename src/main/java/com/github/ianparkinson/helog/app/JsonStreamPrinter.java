@@ -87,7 +87,7 @@ public final class JsonStreamPrinter<T> {
                 T entry = gson.fromJson(jsonReader, jsonTypeToken);
                 if (entry != null) {
                     if (filter.test(entry)) {
-                        ZonedDateTime dateTime = clock.instant().atZone(clock.getZone());
+                        ZonedDateTime dateTime = ZonedDateTime.now(clock);
                         System.out.println(formatter.format(dateTime, entry));
                     }
                 } else if (connection.getError() != null) {
