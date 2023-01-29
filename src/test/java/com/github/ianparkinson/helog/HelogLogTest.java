@@ -9,7 +9,6 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 
 import static com.github.ianparkinson.helog.Helog.ERROR_PREFIX;
 import static com.github.ianparkinson.helog.testing.TestStrings.ISO_OFFSET_DATE_TIME_MILLIS_REGEX;
-import static com.github.ianparkinson.helog.testing.TestStrings.lines;
 import static com.github.ianparkinson.helog.testing.TestStrings.splitLines;
 import static com.google.common.truth.Truth.assertThat;
 
@@ -37,20 +36,26 @@ public final class HelogLogTest {
 
     @Test
     public void writesFormattedJson() {
-        webServer.content.add("{\"name\":\"Christmas Tree\",\"msg\":\"setSysinfo: [led:off]\",\"id\":34, " +
+        webServer.content.add("{\"name\":\"Christmas Tree\",\"msg\":\"setSysinfo: led:off\",\"id\":34, " +
                 "\"time\":\"2022-11-05 16:25:52.729\",\"type\":\"dev\",\"level\":\"info\"}");
         Helog.run("log", webServer.getHostAndPort());
-        assertThat(out.getContent()).isEqualTo(
-                lines("2022-11-05 16:25:52.729 info   dev 34 Christmas Tree  setSysinfo: [led:off]"));
+
+        String[] lines = splitLines(out.getContent());
+        assertThat(lines).hasLength(1);
+        assertThat(lines[0]).matches(
+                ISO_OFFSET_DATE_TIME_MILLIS_REGEX + " info   dev 34 Christmas Tree  setSysinfo: led:off");
     }
 
     @Test
     public void toleratesSplitJson() {
-        webServer.content.add("{\"name\":\"Christmas Tree\",\"msg\":\"setSysinfo: [led:off]\",\"id\":34, ");
+        webServer.content.add("{\"name\":\"Christmas Tree\",\"msg\":\"setSysinfo: led:off\",\"id\":34, ");
         webServer.content.add("\"time\":\"2022-11-05 16:25:52.729\",\"type\":\"dev\",\"level\":\"info\"}");
         Helog.run("log", webServer.getHostAndPort());
-        assertThat(out.getContent()).isEqualTo(
-                lines("2022-11-05 16:25:52.729 info   dev 34 Christmas Tree  setSysinfo: [led:off]"));
+
+        String[] lines = splitLines(out.getContent());
+        assertThat(lines).hasLength(1);
+        assertThat(lines[0]).matches(
+                ISO_OFFSET_DATE_TIME_MILLIS_REGEX + " info   dev 34 Christmas Tree  setSysinfo: led:off");
     }
 
     @Test

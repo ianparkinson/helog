@@ -55,7 +55,7 @@ public final class LogJsonStream implements JsonStream<LogJsonStream.LogEntry> {
 
     private static String format(ZonedDateTime dateTime, LogEntry entry) {
         return String.format("%s %-5s  %s %s %s  %s",
-                emptyIfNull(entry.time),
+                ISO_OFFSET_DATE_TIME_MILLIS.format(dateTime),
                 emptyIfNull(entry.level),
                 emptyIfNull(entry.type),
                 emptyIfNull(entry.id),

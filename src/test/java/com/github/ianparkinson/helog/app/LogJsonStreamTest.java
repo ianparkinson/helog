@@ -134,7 +134,8 @@ class LogJsonStreamTest {
         entry.type = "ty";
         entry.level = "l";
 
-        assertThat(logJsonStream.formatter().format(DATE_TIME, entry)).isEqualTo("ti l      ty i n  m");
+        assertThat(logJsonStream.formatter().format(DATE_TIME, entry))
+                .isEqualTo(DATE_TIME_STRING + " l      ty i n  m");
     }
 
     @Test
