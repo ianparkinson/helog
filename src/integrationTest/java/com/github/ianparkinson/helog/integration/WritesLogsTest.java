@@ -6,8 +6,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 import java.io.IOException;
+import java.time.OffsetDateTime;
 
+import static com.github.ianparkinson.helog.testing.TestStrings.ISO_OFFSET_DATE_TIME_MILLIS_REGEX;
 import static com.github.ianparkinson.helog.testing.TestStrings.lines;
+import static com.github.ianparkinson.helog.testing.TestStrings.splitLines;
 import static com.google.common.truth.Truth.assertThat;
 
 /**
@@ -24,7 +27,25 @@ public class WritesLogsTest {
                 "\"value\" : \"off\", \"type\" : \"digital\", \"unit\":\"null\",\"deviceId\":34,\"hubId\":0," +
                 "\"installedAppId\":0,\"descriptionText\" : \"null\"}");
         HelogCommand.Result result = HelogCommand.run("events", webServer.getHostAndPort());
-        assertThat(result.stdOut).isEqualTo(lines("DEVICE 34 Christmas Tree: switch off"));
+
+        String[] lines = splitLines(result.stdOut);
+        assertThat(lines).hasLength(1);
+        assertThat(lines[0]).matches(ISO_OFFSET_DATE_TIME_MILLIS_REGEX + " DEVICE 34 Christmas Tree: switch off");
+    }
+
+    @Test
+    public void eventTimestamp() throws IOException, InterruptedException {
+        webServer.content.add("{ \"source\":\"DEVICE\",\"name\":\"switch\",\"displayName\" : \"Christmas Tree\", " +
+                "\"value\" : \"off\", \"type\" : \"digital\", \"unit\":\"null\",\"deviceId\":34,\"hubId\":0," +
+                "\"installedAppId\":0,\"descriptionText\" : \"null\"}");
+
+        OffsetDateTime start = OffsetDateTime.now();
+        HelogCommand.Result result = HelogCommand.run("events", webServer.getHostAndPort());
+        OffsetDateTime end = OffsetDateTime.now();
+
+        OffsetDateTime reported = OffsetDateTime.parse(splitLines(result.stdOut)[0].split(" ")[0]);
+        assertThat(reported).isAtLeast(start);
+        assertThat(reported).isAtMost(end);
     }
 
     @Test

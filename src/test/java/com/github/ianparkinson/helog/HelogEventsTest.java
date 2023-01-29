@@ -9,7 +9,6 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 
 import static com.github.ianparkinson.helog.Helog.ERROR_PREFIX;
 import static com.github.ianparkinson.helog.testing.TestStrings.ISO_OFFSET_DATE_TIME_MILLIS_REGEX;
-import static com.github.ianparkinson.helog.testing.TestStrings.lines;
 import static com.github.ianparkinson.helog.testing.TestStrings.splitLines;
 import static com.google.common.truth.Truth.assertThat;
 
@@ -41,7 +40,10 @@ public final class HelogEventsTest {
                 "\"value\" : \"off\", \"type\" : \"digital\", \"unit\":\"null\",\"deviceId\":34,\"hubId\":0," +
                 "\"installedAppId\":0,\"descriptionText\" : \"null\"}");
         Helog.run("events", webServer.getHostAndPort());
-        assertThat(out.getContent()).isEqualTo(lines("DEVICE 34 Christmas Tree: switch off"));
+
+        String[] lines = splitLines(out.getContent());
+        assertThat(lines).hasLength(1);
+        assertThat(lines[0]).matches(ISO_OFFSET_DATE_TIME_MILLIS_REGEX + " DEVICE 34 Christmas Tree: switch off");
     }
 
     @Test
@@ -50,7 +52,11 @@ public final class HelogEventsTest {
                 "\"value\" : \"5\", \"type\" : \"null\", \"unit\":\"jiffy\",\"deviceId\":0,\"hubId\":0," +
                 "\"installedAppId\":93,\"descriptionText\" : \"This is an event\"}");
         Helog.run("events", webServer.getHostAndPort());
-        assertThat(out.getContent()).isEqualTo(lines("APP    93: eventWithDescription 5 jiffy This is an event"));
+
+        String[] lines = splitLines(out.getContent());
+        assertThat(lines).hasLength(1);
+        assertThat(lines[0]).matches(
+                ISO_OFFSET_DATE_TIME_MILLIS_REGEX + " APP    93: eventWithDescription 5 jiffy This is an event");
     }
 
     @Test
@@ -59,7 +65,10 @@ public final class HelogEventsTest {
         webServer.content.add("\"value\" : \"off\", \"type\" : \"digital\", \"unit\":\"null\",\"deviceId\":34,");
         webServer.content.add("\"hubId\":0,\"installedAppId\":0,\"descriptionText\" : \"null\"}");
         Helog.run("events", webServer.getHostAndPort());
-        assertThat(out.getContent()).isEqualTo(lines("DEVICE 34 Christmas Tree: switch off"));
+
+        String[] lines = splitLines(out.getContent());
+        assertThat(lines).hasLength(1);
+        assertThat(lines[0]).matches(ISO_OFFSET_DATE_TIME_MILLIS_REGEX + " DEVICE 34 Christmas Tree: switch off");
     }
 
     @Test

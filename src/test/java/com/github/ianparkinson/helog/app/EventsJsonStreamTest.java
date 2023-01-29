@@ -127,7 +127,8 @@ class EventsJsonStreamTest {
         entry.installedAppId = "0";
         entry.descriptionText= "dt";
 
-        assertThat(eventsJsonStream.formatter().format(DATE_TIME, entry)).isEqualTo("DEVICE 1 dn: n v u dt");
+        assertThat(eventsJsonStream.formatter().format(DATE_TIME, entry))
+                .isEqualTo(DATE_TIME_STRING + " DEVICE 1 dn: n v u dt");
     }
 
     @Test
@@ -144,7 +145,8 @@ class EventsJsonStreamTest {
         entry.installedAppId = "3";
         entry.descriptionText= "dt";
 
-        assertThat(eventsJsonStream.formatter().format(DATE_TIME, entry)).isEqualTo("APP    3 dn: n v u dt");
+        assertThat(eventsJsonStream.formatter().format(DATE_TIME, entry))
+                .isEqualTo(DATE_TIME_STRING + " APP    3 dn: n v u dt");
     }
 
     @Test
@@ -161,7 +163,8 @@ class EventsJsonStreamTest {
         entry.installedAppId = "3";
         entry.descriptionText= "dt";
 
-        assertThat(eventsJsonStream.formatter().format(DATE_TIME, entry)).isEqualTo("???    1 3 dn: n v u dt");
+        assertThat(eventsJsonStream.formatter().format(DATE_TIME, entry))
+                .isEqualTo(DATE_TIME_STRING + " ???    1 3 dn: n v u dt");
     }
 
     @Test

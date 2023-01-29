@@ -55,6 +55,7 @@ public final class EventsJsonStream implements JsonStream<EventsJsonStream.Event
 
     private static String format(ZonedDateTime dateTime, EventEntry entry) {
         List<String> prefixParts = Stream.of(
+                ISO_OFFSET_DATE_TIME_MILLIS.format(dateTime),
                 String.format("%-6s", emptyIfNull(entry.source)),
                 emptyIfNullOrZero(entry.deviceId),
                 emptyIfNullOrZero(entry.installedAppId),
