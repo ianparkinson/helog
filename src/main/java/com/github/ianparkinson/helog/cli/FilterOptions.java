@@ -46,7 +46,7 @@ public class FilterOptions {
 
     @Option(names = "--level",
             split = ",",
-            description = "Include (or exclude) log entries with the given level: @|bold error|@, @|bold warn|@," +
+            description = "Include (or exclude) log entries with the given level: @|bold error|@, @|bold warn|@, " +
                     "@|bold info|@, @|bold debug|@ or @|bold trace|@.")
     public List<LogLevel> level;
 
