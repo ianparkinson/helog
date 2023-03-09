@@ -10,7 +10,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import picocli.CommandLine.Help.Ansi;
 
 import java.time.Clock;
-import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.function.Predicate;
 
@@ -27,7 +27,7 @@ public final class JsonStreamPrinterTest {
     @RegisterExtension
     private final StdErrExtension err = new StdErrExtension();
 
-    private final Clock clock = Clock.fixed(ZonedDateTime.parse(timeString).toInstant(), ZoneId.of("Z"));
+    private final Clock clock = Clock.fixed(ZonedDateTime.parse(timeString).toInstant(), ZoneOffset.UTC);
 
     @Test
     public void formatsEntry() {

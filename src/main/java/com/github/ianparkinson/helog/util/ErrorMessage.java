@@ -1,5 +1,7 @@
 package com.github.ianparkinson.helog.util;
 
+import com.google.errorprone.annotations.FormatMethod;
+import com.google.errorprone.annotations.FormatString;
 import picocli.CommandLine.Help.Ansi;
 
 /**
@@ -42,7 +44,8 @@ public final class ErrorMessage {
         return new ErrorMessage(message, null);
     }
 
-    public static ErrorMessage errorMessage(String message, String detailFormat, Object... detailArgs) {
+    @FormatMethod
+    public static ErrorMessage errorMessage(String message, @FormatString String detailFormat, Object... detailArgs) {
         return new ErrorMessage(message, String.format(detailFormat, detailArgs));
     }
 }

@@ -24,6 +24,13 @@ public final class TestStrings {
     }
 
     /**
+     * Splits a String into fields, separated by rows of spaces.
+     */
+    public static String[] splitFields(String string) {
+        return string.split(" +");
+    }
+
+    /**
      * Regex matching the output of {@link
      * com.github.ianparkinson.helog.util.DateTimeFormatters#ISO_OFFSET_DATE_TIME_MILLIS}.
      */

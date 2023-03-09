@@ -74,7 +74,7 @@ public final class EventsJsonStream implements JsonStream<EventsJsonStream.Event
 
     private static String emptyIfNullOrZero(String id) {
         id = emptyIfNull(id);
-        return (id.trim().equals("0")) ? "" : id;
+        return id.trim().equals("0") ? "" : id;
     }
 
     @Override

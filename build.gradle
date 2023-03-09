@@ -4,6 +4,7 @@ plugins {
     id 'jvm-test-suite'
     id 'application'
     id 'com.palantir.git-version' version '0.15.0'
+    id 'net.ltgt.errorprone' version '3.0.1'
 }
 
 group 'com.github.ianparkinson'
@@ -14,6 +15,9 @@ repositories {
 }
 
 dependencies {
+    errorprone 'com.google.errorprone:error_prone_core:2.15.0'
+
+    compileOnly 'com.google.errorprone:error_prone_core:2.15.0'
     implementation 'com.google.code.gson:gson:2.10'
     implementation 'info.picocli:picocli:4.7.0'
     annotationProcessor 'info.picocli:picocli-codegen:4.7.0'
@@ -63,6 +67,10 @@ testing {
             }
         }
     }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.errorprone.enabled = true
 }
 
 application {

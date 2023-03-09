@@ -7,8 +7,10 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 
 import java.io.IOException;
 import java.time.OffsetDateTime;
+import java.time.ZoneId;
 
 import static com.github.ianparkinson.helog.testing.TestStrings.ISO_OFFSET_DATE_TIME_MILLIS_REGEX;
+import static com.github.ianparkinson.helog.testing.TestStrings.splitFields;
 import static com.github.ianparkinson.helog.testing.TestStrings.splitLines;
 import static com.google.common.truth.Truth.assertThat;
 
@@ -38,11 +40,13 @@ public class WritesLogsTest {
                 "\"value\" : \"off\", \"type\" : \"digital\", \"unit\":\"null\",\"deviceId\":34,\"hubId\":0," +
                 "\"installedAppId\":0,\"descriptionText\" : \"null\"}");
 
-        OffsetDateTime start = OffsetDateTime.now();
+        OffsetDateTime start = OffsetDateTime.now(ZoneId.systemDefault());
         HelogCommand.Result result = HelogCommand.run("events", webServer.getHostAndPort());
-        OffsetDateTime end = OffsetDateTime.now();
+        OffsetDateTime end = OffsetDateTime.now(ZoneId.systemDefault());
 
-        OffsetDateTime reported = OffsetDateTime.parse(splitLines(result.stdOut)[0].split(" ")[0]);
+        String line = splitLines(result.stdOut)[0];
+        String dateField = splitFields(line)[0];
+        OffsetDateTime reported = OffsetDateTime.parse(dateField);
         assertThat(reported).isAtLeast(start);
         assertThat(reported).isAtMost(end);
     }
@@ -64,11 +68,13 @@ public class WritesLogsTest {
         webServer.content.add("{\"name\":\"Christmas Tree\",\"msg\":\"setSysinfo: led:off\",\"id\":34, " +
                 "\"time\":\"2022-11-05 16:25:52.729\",\"type\":\"dev\",\"level\":\"info\"}");
 
-        OffsetDateTime start = OffsetDateTime.now();
+        OffsetDateTime start = OffsetDateTime.now(ZoneId.systemDefault());
         HelogCommand.Result result = HelogCommand.run("log", webServer.getHostAndPort());
-        OffsetDateTime end = OffsetDateTime.now();
+        OffsetDateTime end = OffsetDateTime.now(ZoneId.systemDefault());
 
-        OffsetDateTime reported = OffsetDateTime.parse(splitLines(result.stdOut)[0].split(" ")[0]);
+        String line = splitLines(result.stdOut)[0];
+        String dateField = splitFields(line)[0];
+        OffsetDateTime reported = OffsetDateTime.parse(dateField);
         assertThat(reported).isAtLeast(start);
         assertThat(reported).isAtMost(end);
     }

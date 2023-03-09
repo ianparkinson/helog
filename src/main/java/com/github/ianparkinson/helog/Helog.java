@@ -22,6 +22,7 @@ import picocli.CommandLine.Parameters;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Clock;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.function.Predicate;
@@ -124,7 +125,7 @@ public final class Helog implements Callable<Integer> {
         if (format.csv) {
             JsonStreamFormatter<T, List<String>> csvFormatter = jsonStream.csvFormatter();
             return new JsonStreamPrinter<>(
-                    Clock.systemDefaultZone(),
+                    Clock.system(ZoneId.systemDefault()),
                     Ansi.AUTO,
                     jsonStream.type(),
                     predicate,
@@ -132,7 +133,12 @@ public final class Helog implements Callable<Integer> {
                     (dateTime, event) -> csvLine(csvFormatter.format(dateTime, event)));
         } else {
             return new JsonStreamPrinter<>(
-                    Clock.systemDefaultZone(), Ansi.AUTO, jsonStream.type(), predicate, null, jsonStream.formatter());
+                    Clock.system(ZoneId.systemDefault()),
+                    Ansi.AUTO,
+                    jsonStream.type(),
+                    predicate,
+                    null,
+                    jsonStream.formatter());
         }
     }
 
@@ -165,6 +171,7 @@ public final class Helog implements Callable<Integer> {
      * the {@code jar} section of {@code build.gradle}.
      */
     public static final class VersionProvider implements IVersionProvider {
+        @Override
         public String[] getVersion() {
             Package pack = Helog.class.getPackage();
             return new String[]{

@@ -1,6 +1,7 @@
 package com.github.ianparkinson.helog.testing;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
@@ -26,8 +27,8 @@ public final class HelogCommand {
 
         return new Result(
                 process.exitValue(),
-                new String(process.getInputStream().readAllBytes()),
-                new String(process.getErrorStream().readAllBytes()));
+                new String(process.getInputStream().readAllBytes(), Charset.defaultCharset()),
+                new String(process.getErrorStream().readAllBytes(), Charset.defaultCharset()));
     }
 
     /**

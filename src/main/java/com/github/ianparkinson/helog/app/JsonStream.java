@@ -1,5 +1,6 @@
 package com.github.ianparkinson.helog.app;
 
+import com.google.errorprone.annotations.Immutable;
 import com.google.gson.reflect.TypeToken;
 
 import java.util.List;
@@ -14,6 +15,7 @@ import java.util.function.Predicate;
  *
  * @param <T> Event type representing an entry in the stream.
  */
+@Immutable
 public interface JsonStream<T> {
     /** The usual path to the websocket. */
     String path();

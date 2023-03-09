@@ -1,6 +1,8 @@
 package com.github.ianparkinson.helog.app;
 
 import com.github.ianparkinson.helog.util.ErrorMessage;
+import com.google.errorprone.annotations.FormatMethod;
+import com.google.errorprone.annotations.FormatString;
 import picocli.CommandLine.Help.Ansi;
 
 import java.io.IOException;
@@ -101,7 +103,8 @@ public final class WebSocketSource implements Source {
             return error;
         }
 
-        private void closeOnError(String message, String detailFormat, Object... detailArgs) {
+        @FormatMethod
+        private void closeOnError(String message, @FormatString String detailFormat, Object... detailArgs) {
             this.error = errorMessage(message, detailFormat, detailArgs);
             try {
                 writer.close();
