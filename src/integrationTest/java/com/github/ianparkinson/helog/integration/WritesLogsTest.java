@@ -9,8 +9,8 @@ import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 
-import static com.github.ianparkinson.helog.testing.TestStrings.ISO_OFFSET_DATE_TIME_MILLIS_REGEX;
-import static com.github.ianparkinson.helog.testing.TestStrings.splitFields;
+import static com.github.ianparkinson.helog.testing.TestStrings.dropDateTime;
+import static com.github.ianparkinson.helog.testing.TestStrings.extractDateTime;
 import static com.github.ianparkinson.helog.testing.TestStrings.splitLines;
 import static com.google.common.truth.Truth.assertThat;
 
@@ -31,7 +31,7 @@ public class WritesLogsTest {
 
         String[] lines = splitLines(result.stdOut);
         assertThat(lines).hasLength(1);
-        assertThat(lines[0]).matches(ISO_OFFSET_DATE_TIME_MILLIS_REGEX + " DEVICE 34 Christmas Tree: switch off");
+        assertThat(dropDateTime(lines[0])).isEqualTo(" DEVICE 34 Christmas Tree: switch off");
     }
 
     @Test
@@ -44,9 +44,8 @@ public class WritesLogsTest {
         HelogCommand.Result result = HelogCommand.run("events", webServer.getHostAndPort());
         OffsetDateTime end = OffsetDateTime.now(ZoneId.systemDefault());
 
-        String line = splitLines(result.stdOut)[0];
-        String dateField = splitFields(line)[0];
-        OffsetDateTime reported = OffsetDateTime.parse(dateField);
+        String[] lines = splitLines(result.stdOut);
+        OffsetDateTime reported = extractDateTime(lines[0]);
         assertThat(reported).isAtLeast(start);
         assertThat(reported).isAtMost(end);
     }
@@ -59,8 +58,7 @@ public class WritesLogsTest {
 
         String[] lines = splitLines(result.stdOut);
         assertThat(lines).hasLength(1);
-        assertThat(lines[0])
-                .matches(ISO_OFFSET_DATE_TIME_MILLIS_REGEX + " info   dev 34 Christmas Tree  setSysinfo: led:off");
+        assertThat(dropDateTime(lines[0])).isEqualTo(" info   dev 34 Christmas Tree  setSysinfo: led:off");
     }
 
     @Test
@@ -72,9 +70,8 @@ public class WritesLogsTest {
         HelogCommand.Result result = HelogCommand.run("log", webServer.getHostAndPort());
         OffsetDateTime end = OffsetDateTime.now(ZoneId.systemDefault());
 
-        String line = splitLines(result.stdOut)[0];
-        String dateField = splitFields(line)[0];
-        OffsetDateTime reported = OffsetDateTime.parse(dateField);
+        String[] lines = splitLines(result.stdOut);
+        OffsetDateTime reported = extractDateTime(lines[0]);
         assertThat(reported).isAtLeast(start);
         assertThat(reported).isAtMost(end);
     }

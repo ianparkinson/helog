@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 import static com.github.ianparkinson.helog.Helog.ERROR_PREFIX;
-import static com.github.ianparkinson.helog.testing.TestStrings.ISO_OFFSET_DATE_TIME_MILLIS_REGEX;
+import static com.github.ianparkinson.helog.testing.TestStrings.dropDateTime;
 import static com.github.ianparkinson.helog.testing.TestStrings.splitLines;
 import static com.google.common.truth.Truth.assertThat;
 
@@ -42,8 +42,7 @@ public final class HelogLogTest {
 
         String[] lines = splitLines(out.getContent());
         assertThat(lines).hasLength(1);
-        assertThat(lines[0]).matches(
-                ISO_OFFSET_DATE_TIME_MILLIS_REGEX + " info   dev 34 Christmas Tree  setSysinfo: led:off");
+        assertThat(dropDateTime(lines[0])).isEqualTo(" info   dev 34 Christmas Tree  setSysinfo: led:off");
     }
 
     @Test
@@ -54,8 +53,7 @@ public final class HelogLogTest {
 
         String[] lines = splitLines(out.getContent());
         assertThat(lines).hasLength(1);
-        assertThat(lines[0]).matches(
-                ISO_OFFSET_DATE_TIME_MILLIS_REGEX + " info   dev 34 Christmas Tree  setSysinfo: led:off");
+        assertThat(dropDateTime(lines[0])).isEqualTo(" info   dev 34 Christmas Tree  setSysinfo: led:off");
     }
 
     @Test
@@ -167,7 +165,7 @@ public final class HelogLogTest {
         String[] lines = splitLines(out.getContent());
         assertThat(lines).hasLength(2);
         assertThat(lines[0]).isEqualTo("localTime,name,msg,id,time,type,level");
-        assertThat(lines[1]).matches(ISO_OFFSET_DATE_TIME_MILLIS_REGEX +
+        assertThat(dropDateTime(lines[1])).isEqualTo(
                 ",Christmas Tree,setSysinfo: led:off,34,2022-11-05 16:25:52.729,dev,info");
     }
 

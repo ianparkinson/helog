@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 import static com.github.ianparkinson.helog.Helog.ERROR_PREFIX;
-import static com.github.ianparkinson.helog.testing.TestStrings.ISO_OFFSET_DATE_TIME_MILLIS_REGEX;
+import static com.github.ianparkinson.helog.testing.TestStrings.dropDateTime;
 import static com.github.ianparkinson.helog.testing.TestStrings.splitLines;
 import static com.google.common.truth.Truth.assertThat;
 
@@ -43,7 +43,7 @@ public final class HelogEventsTest {
 
         String[] lines = splitLines(out.getContent());
         assertThat(lines).hasLength(1);
-        assertThat(lines[0]).matches(ISO_OFFSET_DATE_TIME_MILLIS_REGEX + " DEVICE 34 Christmas Tree: switch off");
+        assertThat(dropDateTime(lines[0])).isEqualTo(" DEVICE 34 Christmas Tree: switch off");
     }
 
     @Test
@@ -55,8 +55,7 @@ public final class HelogEventsTest {
 
         String[] lines = splitLines(out.getContent());
         assertThat(lines).hasLength(1);
-        assertThat(lines[0]).matches(
-                ISO_OFFSET_DATE_TIME_MILLIS_REGEX + " APP    93: eventWithDescription 5 jiffy This is an event");
+        assertThat(dropDateTime(lines[0])).isEqualTo(" APP    93: eventWithDescription 5 jiffy This is an event");
     }
 
     @Test
@@ -68,7 +67,7 @@ public final class HelogEventsTest {
 
         String[] lines = splitLines(out.getContent());
         assertThat(lines).hasLength(1);
-        assertThat(lines[0]).matches(ISO_OFFSET_DATE_TIME_MILLIS_REGEX + " DEVICE 34 Christmas Tree: switch off");
+        assertThat(dropDateTime(lines[0])).isEqualTo(" DEVICE 34 Christmas Tree: switch off");
     }
 
     @Test
@@ -212,8 +211,7 @@ public final class HelogEventsTest {
         assertThat(lines).hasLength(2);
         assertThat(lines[0]).isEqualTo(
                 "localTime,source,name,displayName,value,type,unit,deviceId,hubId,installedAppId,descriptionText");
-        assertThat(lines[1]).matches(
-                ISO_OFFSET_DATE_TIME_MILLIS_REGEX + ",DEVICE,switch,Christmas Tree,off,digital,,34,0,0,");
+        assertThat(dropDateTime(lines[1])).isEqualTo(",DEVICE,switch,Christmas Tree,off,digital,,34,0,0,");
     }
 
     @Test
