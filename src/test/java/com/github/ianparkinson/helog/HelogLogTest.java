@@ -7,6 +7,8 @@ import okhttp3.mockwebserver.RecordedRequest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
+import java.util.List;
+
 import static com.github.ianparkinson.helog.Helog.ERROR_PREFIX;
 import static com.github.ianparkinson.helog.testing.TestStrings.dropDateTime;
 import static com.github.ianparkinson.helog.testing.TestStrings.splitLines;
@@ -30,7 +32,7 @@ public final class HelogLogTest {
     @Test
     public void reportsConnection() {
         Helog.run("log", webServer.getHostAndPort());
-        assertThat(splitLines(err.getContent())[0]).isEqualTo(
+        assertThat(splitLines(err.getContent()).get(0)).isEqualTo(
                 "Connected to ws://" + webServer.getHostAndPort() + "/logsocket");
     }
 
@@ -40,9 +42,9 @@ public final class HelogLogTest {
                 "\"time\":\"2022-11-05 16:25:52.729\",\"type\":\"dev\",\"level\":\"info\"}");
         Helog.run("log", webServer.getHostAndPort());
 
-        String[] lines = splitLines(out.getContent());
-        assertThat(lines).hasLength(1);
-        assertThat(dropDateTime(lines[0])).isEqualTo(" info   dev 34 Christmas Tree  setSysinfo: led:off");
+        List<String> lines = splitLines(out.getContent());
+        assertThat(lines).hasSize(1);
+        assertThat(dropDateTime(lines.get(0))).isEqualTo(" info   dev 34 Christmas Tree  setSysinfo: led:off");
     }
 
     @Test
@@ -51,9 +53,9 @@ public final class HelogLogTest {
         webServer.content.add("\"time\":\"2022-11-05 16:25:52.729\",\"type\":\"dev\",\"level\":\"info\"}");
         Helog.run("log", webServer.getHostAndPort());
 
-        String[] lines = splitLines(out.getContent());
-        assertThat(lines).hasLength(1);
-        assertThat(dropDateTime(lines[0])).isEqualTo(" info   dev 34 Christmas Tree  setSysinfo: led:off");
+        List<String> lines = splitLines(out.getContent());
+        assertThat(lines).hasSize(1);
+        assertThat(dropDateTime(lines.get(0))).isEqualTo(" info   dev 34 Christmas Tree  setSysinfo: led:off");
     }
 
     @Test
@@ -69,10 +71,10 @@ public final class HelogLogTest {
 
         Helog.run("log", webServer.getHostAndPort(), "--device=MatchByName,36");
 
-        String[] lines = splitLines(out.getContent());
-        assertThat(lines).hasLength(2);
-        assertThat(lines[0]).contains("MatchByName");
-        assertThat(lines[1]).contains("MatchById");
+        List<String> lines = splitLines(out.getContent());
+        assertThat(lines).hasSize(2);
+        assertThat(lines.get(0)).contains("MatchByName");
+        assertThat(lines.get(1)).contains("MatchById");
     }
 
     @Test
@@ -88,10 +90,10 @@ public final class HelogLogTest {
 
         Helog.run("log", webServer.getHostAndPort(), "--xdevice=MatchByName,36");
 
-        String[] lines = splitLines(out.getContent());
-        assertThat(lines).hasLength(2);
-        assertThat(lines[0]).contains("OtherDevice");
-        assertThat(lines[1]).contains("OtherApp");
+        List<String> lines = splitLines(out.getContent());
+        assertThat(lines).hasSize(2);
+        assertThat(lines.get(0)).contains("OtherDevice");
+        assertThat(lines.get(1)).contains("OtherApp");
     }
 
     @Test
@@ -105,10 +107,10 @@ public final class HelogLogTest {
         webServer.content.add("{\"name\":\"OtherDevice\",\"msg\":\"msg\",\"id\":36, " +
                 "\"time\":\"2022-11-05 16:25:52.729\",\"type\":\"dev\",\"level\":\"info\"}");
         Helog.run("log", webServer.getHostAndPort(), "--app=MatchByName,36");
-        String[] lines = splitLines(out.getContent());
-        assertThat(lines).hasLength(2);
-        assertThat(lines[0]).contains("MatchByName");
-        assertThat(lines[1]).contains("MatchById");
+        List<String> lines = splitLines(out.getContent());
+        assertThat(lines).hasSize(2);
+        assertThat(lines.get(0)).contains("MatchByName");
+        assertThat(lines.get(1)).contains("MatchById");
     }
 
     @Test
@@ -122,10 +124,10 @@ public final class HelogLogTest {
         webServer.content.add("{\"name\":\"OtherDevice\",\"msg\":\"msg\",\"id\":36, " +
                 "\"time\":\"2022-11-05 16:25:52.729\",\"type\":\"dev\",\"level\":\"info\"}");
         Helog.run("log", webServer.getHostAndPort(), "--xapp=MatchByName,36");
-        String[] lines = splitLines(out.getContent());
-        assertThat(lines).hasLength(2);
-        assertThat(lines[0]).contains("OtherApp");
-        assertThat(lines[1]).contains("OtherDevice");
+        List<String> lines = splitLines(out.getContent());
+        assertThat(lines).hasSize(2);
+        assertThat(lines.get(0)).contains("OtherApp");
+        assertThat(lines.get(1)).contains("OtherDevice");
     }
 
     @Test
@@ -137,10 +139,10 @@ public final class HelogLogTest {
         webServer.content.add("{\"name\":\"SecondMatch\",\"msg\":\"msg\",\"id\":36, " +
                 "\"time\":\"2022-11-05 16:25:52.729\",\"type\":\"app\",\"level\":\"debug\"}");
         Helog.run("log", webServer.getHostAndPort(), "--level=info,debug");
-        String[] lines = splitLines(out.getContent());
-        assertThat(lines).hasLength(2);
-        assertThat(lines[0]).contains("FirstMatch");
-        assertThat(lines[1]).contains("SecondMatch");
+        List<String> lines = splitLines(out.getContent());
+        assertThat(lines).hasSize(2);
+        assertThat(lines.get(0)).contains("FirstMatch");
+        assertThat(lines.get(1)).contains("SecondMatch");
     }
 
     @Test
@@ -152,9 +154,9 @@ public final class HelogLogTest {
         webServer.content.add("{\"name\":\"SecondMatch\",\"msg\":\"msg\",\"id\":36, " +
                 "\"time\":\"2022-11-05 16:25:52.729\",\"type\":\"app\",\"level\":\"debug\"}");
         Helog.run("log", webServer.getHostAndPort(), "--xlevel=info,debug");
-        String[] lines = splitLines(out.getContent());
-        assertThat(lines).hasLength(1);
-        assertThat(lines[0]).contains("NoMatch");
+        List<String> lines = splitLines(out.getContent());
+        assertThat(lines).hasSize(1);
+        assertThat(lines.get(0)).contains("NoMatch");
     }
 
     @Test
@@ -162,10 +164,10 @@ public final class HelogLogTest {
         webServer.content.add("{\"name\":\"Christmas Tree\",\"msg\":\"setSysinfo: led:off\",\"id\":34, " +
                 "\"time\":\"2022-11-05 16:25:52.729\",\"type\":\"dev\",\"level\":\"info\"}");
         Helog.run("log", webServer.getHostAndPort(), "--csv");
-        String[] lines = splitLines(out.getContent());
-        assertThat(lines).hasLength(2);
-        assertThat(lines[0]).isEqualTo("localTime,name,msg,id,time,type,level");
-        assertThat(dropDateTime(lines[1])).isEqualTo(
+        List<String> lines = splitLines(out.getContent());
+        assertThat(lines).hasSize(2);
+        assertThat(lines.get(0)).isEqualTo("localTime,name,msg,id,time,type,level");
+        assertThat(dropDateTime(lines.get(1))).isEqualTo(
                 ",Christmas Tree,setSysinfo: led:off,34,2022-11-05 16:25:52.729,dev,info");
     }
 

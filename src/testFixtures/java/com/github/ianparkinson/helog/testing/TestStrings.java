@@ -2,6 +2,8 @@ package com.github.ianparkinson.helog.testing;
 
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -14,6 +16,11 @@ public final class TestStrings {
     private static final Pattern ISO_OFFSET_DATE_TIME_MILLIS_PATTERN = Pattern.compile(
             "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}(Z|([+\\-])\\d{2}:\\d{2})"
     );
+
+    /**
+     * Pattern matching any Unicode line separator.
+     */
+    private static final Pattern LINE_SEPARATOR_PATTERN = Pattern.compile("\\R");
 
     private TestStrings() {
     }
@@ -32,9 +39,23 @@ public final class TestStrings {
 
     /**
      * Splits a String into lines, using any Unicode line separator.
+     *
+     * <p>Empty lines are included, and any unterminated trailing text is treated as a line.
      */
-    public static String[] splitLines(String string) {
-        return string.split("\\R");
+    public static List<String> splitLines(String string) {
+        // Instead of relying on Java's String.split(), which won't properly handle empty lines (see
+        // https://errorprone.info/bugpattern/StringSplitter), use a simple loop.
+        List<String> output = new ArrayList<>();
+        Matcher matcher = LINE_SEPARATOR_PATTERN.matcher(string);
+        int lineStart = 0;
+        while (matcher.find()) {
+            output.add(string.substring(lineStart, matcher.start()));
+            lineStart = matcher.end();
+        }
+        if (lineStart != string.length()) {
+            output.add(string.substring(lineStart));
+        }
+        return output;
     }
 
     /**

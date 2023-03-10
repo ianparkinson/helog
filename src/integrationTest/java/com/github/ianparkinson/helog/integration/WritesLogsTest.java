@@ -8,6 +8,7 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
+import java.util.List;
 
 import static com.github.ianparkinson.helog.testing.TestStrings.dropDateTime;
 import static com.github.ianparkinson.helog.testing.TestStrings.extractDateTime;
@@ -29,9 +30,9 @@ public class WritesLogsTest {
                 "\"installedAppId\":0,\"descriptionText\" : \"null\"}");
         HelogCommand.Result result = HelogCommand.run("events", webServer.getHostAndPort());
 
-        String[] lines = splitLines(result.stdOut);
-        assertThat(lines).hasLength(1);
-        assertThat(dropDateTime(lines[0])).isEqualTo(" DEVICE 34 Christmas Tree: switch off");
+        List<String> lines = splitLines(result.stdOut);
+        assertThat(lines).hasSize(1);
+        assertThat(dropDateTime(lines.get(0))).isEqualTo(" DEVICE 34 Christmas Tree: switch off");
     }
 
     @Test
@@ -44,8 +45,8 @@ public class WritesLogsTest {
         HelogCommand.Result result = HelogCommand.run("events", webServer.getHostAndPort());
         OffsetDateTime end = OffsetDateTime.now(ZoneId.systemDefault());
 
-        String[] lines = splitLines(result.stdOut);
-        OffsetDateTime reported = extractDateTime(lines[0]);
+        List<String> lines = splitLines(result.stdOut);
+        OffsetDateTime reported = extractDateTime(lines.get(0));
         assertThat(reported).isAtLeast(start);
         assertThat(reported).isAtMost(end);
     }
@@ -56,9 +57,9 @@ public class WritesLogsTest {
                 "\"time\":\"2022-11-05 16:25:52.729\",\"type\":\"dev\",\"level\":\"info\"}");
         HelogCommand.Result result = HelogCommand.run("log", webServer.getHostAndPort());
 
-        String[] lines = splitLines(result.stdOut);
-        assertThat(lines).hasLength(1);
-        assertThat(dropDateTime(lines[0])).isEqualTo(" info   dev 34 Christmas Tree  setSysinfo: led:off");
+        List<String> lines = splitLines(result.stdOut);
+        assertThat(lines).hasSize(1);
+        assertThat(dropDateTime(lines.get(0))).isEqualTo(" info   dev 34 Christmas Tree  setSysinfo: led:off");
     }
 
     @Test
@@ -70,8 +71,8 @@ public class WritesLogsTest {
         HelogCommand.Result result = HelogCommand.run("log", webServer.getHostAndPort());
         OffsetDateTime end = OffsetDateTime.now(ZoneId.systemDefault());
 
-        String[] lines = splitLines(result.stdOut);
-        OffsetDateTime reported = extractDateTime(lines[0]);
+        List<String> lines = splitLines(result.stdOut);
+        OffsetDateTime reported = extractDateTime(lines.get(0));
         assertThat(reported).isAtLeast(start);
         assertThat(reported).isAtMost(end);
     }

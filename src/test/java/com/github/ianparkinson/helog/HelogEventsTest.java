@@ -7,6 +7,8 @@ import okhttp3.mockwebserver.RecordedRequest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
+import java.util.List;
+
 import static com.github.ianparkinson.helog.Helog.ERROR_PREFIX;
 import static com.github.ianparkinson.helog.testing.TestStrings.dropDateTime;
 import static com.github.ianparkinson.helog.testing.TestStrings.splitLines;
@@ -30,7 +32,7 @@ public final class HelogEventsTest {
     @Test
     public void reportsConnection() {
         Helog.run("events", webServer.getHostAndPort());
-        assertThat(splitLines(err.getContent())[0]).isEqualTo(
+        assertThat(splitLines(err.getContent()).get(0)).isEqualTo(
                 "Connected to ws://" + webServer.getHostAndPort() + "/eventsocket");
     }
 
@@ -41,9 +43,9 @@ public final class HelogEventsTest {
                 "\"installedAppId\":0,\"descriptionText\" : \"null\"}");
         Helog.run("events", webServer.getHostAndPort());
 
-        String[] lines = splitLines(out.getContent());
-        assertThat(lines).hasLength(1);
-        assertThat(dropDateTime(lines[0])).isEqualTo(" DEVICE 34 Christmas Tree: switch off");
+        List<String> lines = splitLines(out.getContent());
+        assertThat(lines).hasSize(1);
+        assertThat(dropDateTime(lines.get(0))).isEqualTo(" DEVICE 34 Christmas Tree: switch off");
     }
 
     @Test
@@ -53,9 +55,9 @@ public final class HelogEventsTest {
                 "\"installedAppId\":93,\"descriptionText\" : \"This is an event\"}");
         Helog.run("events", webServer.getHostAndPort());
 
-        String[] lines = splitLines(out.getContent());
-        assertThat(lines).hasLength(1);
-        assertThat(dropDateTime(lines[0])).isEqualTo(" APP    93: eventWithDescription 5 jiffy This is an event");
+        List<String> lines = splitLines(out.getContent());
+        assertThat(lines).hasSize(1);
+        assertThat(dropDateTime(lines.get(0))).isEqualTo(" APP    93: eventWithDescription 5 jiffy This is an event");
     }
 
     @Test
@@ -65,9 +67,9 @@ public final class HelogEventsTest {
         webServer.content.add("\"hubId\":0,\"installedAppId\":0,\"descriptionText\" : \"null\"}");
         Helog.run("events", webServer.getHostAndPort());
 
-        String[] lines = splitLines(out.getContent());
-        assertThat(lines).hasLength(1);
-        assertThat(dropDateTime(lines[0])).isEqualTo(" DEVICE 34 Christmas Tree: switch off");
+        List<String> lines = splitLines(out.getContent());
+        assertThat(lines).hasSize(1);
+        assertThat(dropDateTime(lines.get(0))).isEqualTo(" DEVICE 34 Christmas Tree: switch off");
     }
 
     @Test
@@ -87,10 +89,10 @@ public final class HelogEventsTest {
 
         Helog.run("events", webServer.getHostAndPort(), "--device=MatchByName,36");
 
-        String[] lines = splitLines(out.getContent());
-        assertThat(lines).hasLength(2);
-        assertThat(lines[0]).contains("MatchByName");
-        assertThat(lines[1]).contains("MatchById");
+        List<String> lines = splitLines(out.getContent());
+        assertThat(lines).hasSize(2);
+        assertThat(lines.get(0)).contains("MatchByName");
+        assertThat(lines.get(1)).contains("MatchById");
     }
 
     @Test
@@ -110,10 +112,10 @@ public final class HelogEventsTest {
 
         Helog.run("events", webServer.getHostAndPort(), "--xdevice=MatchByName,36");
 
-        String[] lines = splitLines(out.getContent());
-        assertThat(lines).hasLength(2);
-        assertThat(lines[0]).contains("OtherDevice");
-        assertThat(lines[1]).contains("OtherApp");
+        List<String> lines = splitLines(out.getContent());
+        assertThat(lines).hasSize(2);
+        assertThat(lines.get(0)).contains("OtherDevice");
+        assertThat(lines.get(1)).contains("OtherApp");
     }
 
     @Test
@@ -133,10 +135,10 @@ public final class HelogEventsTest {
 
         Helog.run("events", webServer.getHostAndPort(), "--app=34,36");
 
-        String[] lines = splitLines(out.getContent());
-        assertThat(lines).hasLength(2);
-        assertThat(lines[0]).contains("FirstMatch");
-        assertThat(lines[1]).contains("SecondMatch");
+        List<String> lines = splitLines(out.getContent());
+        assertThat(lines).hasSize(2);
+        assertThat(lines.get(0)).contains("FirstMatch");
+        assertThat(lines.get(1)).contains("SecondMatch");
     }
 
     @Test
@@ -156,10 +158,10 @@ public final class HelogEventsTest {
 
         Helog.run("events", webServer.getHostAndPort(), "--xapp=34,36");
 
-        String[] lines = splitLines(out.getContent());
-        assertThat(lines).hasLength(2);
-        assertThat(lines[0]).contains("OtherApp");
-        assertThat(lines[1]).contains("OtherDevice");
+        List<String> lines = splitLines(out.getContent());
+        assertThat(lines).hasSize(2);
+        assertThat(lines.get(0)).contains("OtherApp");
+        assertThat(lines.get(1)).contains("OtherDevice");
     }
 
     @Test
@@ -176,10 +178,10 @@ public final class HelogEventsTest {
 
         Helog.run("events", webServer.getHostAndPort(), "--name=Prop1,Prop3");
 
-        String[] lines = splitLines(out.getContent());
-        assertThat(lines).hasLength(2);
-        assertThat(lines[0]).contains("FirstMatch");
-        assertThat(lines[1]).contains("SecondMatch");
+        List<String> lines = splitLines(out.getContent());
+        assertThat(lines).hasSize(2);
+        assertThat(lines.get(0)).contains("FirstMatch");
+        assertThat(lines.get(1)).contains("SecondMatch");
     }
 
     @Test
@@ -196,9 +198,9 @@ public final class HelogEventsTest {
 
         Helog.run("events", webServer.getHostAndPort(), "--xname=Prop1,Prop3");
 
-        String[] lines = splitLines(out.getContent());
-        assertThat(lines).hasLength(1);
-        assertThat(lines[0]).contains("NoMatch");
+        List<String> lines = splitLines(out.getContent());
+        assertThat(lines).hasSize(1);
+        assertThat(lines.get(0)).contains("NoMatch");
     }
 
     @Test
@@ -207,11 +209,11 @@ public final class HelogEventsTest {
                 "\"value\" : \"off\", \"type\" : \"digital\", \"unit\":\"null\",\"deviceId\":34,\"hubId\":0," +
                 "\"installedAppId\":0,\"descriptionText\" : \"null\"}");
         Helog.run("events", webServer.getHostAndPort(), "--csv");
-        String[] lines = splitLines(out.getContent());
-        assertThat(lines).hasLength(2);
-        assertThat(lines[0]).isEqualTo(
+        List<String> lines = splitLines(out.getContent());
+        assertThat(lines).hasSize(2);
+        assertThat(lines.get(0)).isEqualTo(
                 "localTime,source,name,displayName,value,type,unit,deviceId,hubId,installedAppId,descriptionText");
-        assertThat(dropDateTime(lines[1])).isEqualTo(",DEVICE,switch,Christmas Tree,off,digital,,34,0,0,");
+        assertThat(dropDateTime(lines.get(1))).isEqualTo(",DEVICE,switch,Christmas Tree,off,digital,,34,0,0,");
     }
 
     @Test
