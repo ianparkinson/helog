@@ -1,10 +1,10 @@
 package com.github.ianparkinson.helog;
 
+import com.github.ianparkinson.helog.app.JsonRenderer;
 import com.github.ianparkinson.helog.app.JsonStream;
-import com.github.ianparkinson.helog.app.JsonStreamFormatter;
-import com.github.ianparkinson.helog.app.JsonStreamPrinter;
-import com.github.ianparkinson.helog.app.RawPrinter;
-import com.github.ianparkinson.helog.app.WebSocketSource;
+import com.github.ianparkinson.helog.app.StreamPrinter;
+import com.github.ianparkinson.helog.app.TextWebSocketClient;
+import com.github.ianparkinson.helog.app.TextWebSocketClientImpl;
 import com.github.ianparkinson.helog.cli.FilterOptions;
 import com.github.ianparkinson.helog.cli.FormatOptions;
 import com.github.ianparkinson.helog.cli.ParameterValidationException;
@@ -23,9 +23,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Clock;
 import java.time.ZoneId;
-import java.util.List;
 import java.util.concurrent.Callable;
-import java.util.function.Predicate;
 
 import static com.github.ianparkinson.helog.util.Strings.csvLine;
 
@@ -97,7 +95,7 @@ public final class Helog implements Callable<Integer> {
     }
 
     @Override
-    public Integer call() throws URISyntaxException {
+    public Integer call() throws URISyntaxException, InterruptedException {
         if (helpOptions.kofi) {
             kofi();
             return 0;
@@ -109,37 +107,34 @@ public final class Helog implements Callable<Integer> {
             throw new ParameterException(commandSpec.commandLine(), ERROR_PREFIX + e.getMessage());
         }
 
-        URI uri = new URI("ws://" + host + "/" + stream.jsonStream.path());
-        WebSocketSource source = new WebSocketSource(Ansi.AUTO, uri);
+        TextWebSocketClient client = new TextWebSocketClientImpl();
+        Clock clock = Clock.system(ZoneId.systemDefault());
+        StreamPrinter printer = new StreamPrinter(clock, Ansi.AUTO, client);
 
+        JsonStream<?> jsonStream = stream.jsonStream;
+        URI uri = new URI("ws://" + host + "/" + stream.jsonStream.path());
         if (format.raw) {
-            new RawPrinter(Ansi.AUTO).run(source);
+            printer.stream(uri, null, (dateTime, text) -> text).waitUntilError();
+        } else if (format.csv) {
+            printer.stream(uri, csvLine(jsonStream.csvHeader()), createCsvJsonRenderer(jsonStream)).waitUntilError();
         } else {
-            createJsonStreamPrinter(stream.jsonStream).run(source);
+            printer.stream(uri, null, createHumanReadableJsonRenderer(jsonStream)).waitUntilError();
         }
         return 1;
     }
 
-    private <T> JsonStreamPrinter<T> createJsonStreamPrinter(JsonStream<T> jsonStream) {
-        Predicate<T> predicate = filter.createPredicate(jsonStream);
-        if (format.csv) {
-            JsonStreamFormatter<T, List<String>> csvFormatter = jsonStream.csvFormatter();
-            return new JsonStreamPrinter<>(
-                    Clock.system(ZoneId.systemDefault()),
-                    Ansi.AUTO,
-                    jsonStream.type(),
-                    predicate,
-                    csvLine(jsonStream.csvHeader()),
-                    (dateTime, event) -> csvLine(csvFormatter.format(dateTime, event)));
-        } else {
-            return new JsonStreamPrinter<>(
-                    Clock.system(ZoneId.systemDefault()),
-                    Ansi.AUTO,
-                    jsonStream.type(),
-                    predicate,
-                    null,
-                    jsonStream.formatter());
-        }
+    private <T> JsonRenderer<T> createHumanReadableJsonRenderer(JsonStream<T> jsonStream) {
+        return new JsonRenderer<>(
+                jsonStream.type(),
+                filter.createPredicate(jsonStream),
+                jsonStream.formatter());
+    }
+
+    private <T> JsonRenderer<T> createCsvJsonRenderer(JsonStream<T> jsonStream) {
+        return new JsonRenderer<>(
+                jsonStream.type(),
+                filter.createPredicate(jsonStream),
+                (dateTime, event) -> csvLine(jsonStream.csvFormatter().format(dateTime, event)));
     }
 
     public static void kofi() {

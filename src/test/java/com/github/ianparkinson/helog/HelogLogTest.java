@@ -48,17 +48,6 @@ public final class HelogLogTest {
     }
 
     @Test
-    public void toleratesSplitJson() {
-        webServer.content.add("{\"name\":\"Christmas Tree\",\"msg\":\"setSysinfo: led:off\",\"id\":34, ");
-        webServer.content.add("\"time\":\"2022-11-05 16:25:52.729\",\"type\":\"dev\",\"level\":\"info\"}");
-        Helog.run("log", webServer.getHostAndPort());
-
-        List<String> lines = splitLines(out.getContent());
-        assertThat(lines).hasSize(1);
-        assertThat(dropDateTime(lines.get(0))).isEqualTo(" info   dev 34 Christmas Tree  setSysinfo: led:off");
-    }
-
-    @Test
     public void filterIncludeDevice() {
         webServer.content.add("{\"name\":\"MatchByName\",\"msg\":\"msg\",\"id\":34, " +
                 "\"time\":\"2022-11-05 16:25:52.729\",\"type\":\"dev\",\"level\":\"info\"}");
@@ -172,11 +161,28 @@ public final class HelogLogTest {
     }
 
     @Test
+    public void toleratesMalformedJson() {
+        webServer.content.add("unparseable");
+        webServer.content.add("{\"name\":\"Christmas Tree\",\"msg\":\"setSysinfo: led:off\",\"id\":34, " +
+                "\"time\":\"2022-11-05 16:25:52.729\",\"type\":\"dev\",\"level\":\"info\"}");
+        Helog.run("log", webServer.getHostAndPort());
+
+        List<String> errLines = splitLines(err.getContent());
+        assertThat(errLines.get(1)).contains("Malformed JSON");
+        assertThat(errLines.get(2)).isEqualTo("unparseable");
+
+        List<String> lines = splitLines(out.getContent());
+        assertThat(lines).hasSize(1);
+        assertThat(dropDateTime(lines.get(0))).isEqualTo(" info   dev 34 Christmas Tree  setSysinfo: led:off");
+    }
+
+    @Test
     public void rawSpoolsExact() {
-        webServer.content.add("abc");
-        webServer.content.add("def");
+        webServer.content.add("abcdef");
         Helog.run("log", webServer.getHostAndPort(), "--raw");
-        assertThat(out.getContent()).isEqualTo("abcdef");
+
+        List<String> lines = splitLines(out.getContent());
+        assertThat(lines).containsExactly("abcdef");
     }
 
     @Test

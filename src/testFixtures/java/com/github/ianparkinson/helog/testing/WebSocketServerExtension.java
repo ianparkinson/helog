@@ -57,6 +57,10 @@ public final class WebSocketServerExtension implements BeforeEachCallback, After
         return webServer.takeRequest();
     }
 
+    public void close() throws IOException {
+        webServer.close();
+    }
+
     private class TestWebSocketListener extends WebSocketListener {
         @Override
         public void onOpen(@NotNull WebSocket webSocket, @NotNull Response response) {

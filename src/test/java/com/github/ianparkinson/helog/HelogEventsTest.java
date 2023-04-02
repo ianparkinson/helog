@@ -61,18 +61,6 @@ public final class HelogEventsTest {
     }
 
     @Test
-    public void toleratesSplitJson() {
-        webServer.content.add("{ \"source\":\"DEVICE\",\"name\":\"switch\",\"displayName\" : \"Christmas Tree\", ");
-        webServer.content.add("\"value\" : \"off\", \"type\" : \"digital\", \"unit\":\"null\",\"deviceId\":34,");
-        webServer.content.add("\"hubId\":0,\"installedAppId\":0,\"descriptionText\" : \"null\"}");
-        Helog.run("events", webServer.getHostAndPort());
-
-        List<String> lines = splitLines(out.getContent());
-        assertThat(lines).hasSize(1);
-        assertThat(dropDateTime(lines.get(0))).isEqualTo(" DEVICE 34 Christmas Tree: switch off");
-    }
-
-    @Test
     public void filterIncludeDevice() {
         webServer.content.add("{ \"source\":\"DEVICE\",\"name\":\"switch\",\"displayName\" : \"MatchByName\", " +
                 "\"value\" : \"off\", \"type\" : \"digital\", \"unit\":\"null\",\"deviceId\":34,\"hubId\":0," +
@@ -217,11 +205,29 @@ public final class HelogEventsTest {
     }
 
     @Test
+    public void toleratesMalformedJson() {
+        webServer.content.add("unparseable");
+        webServer.content.add("{ \"source\":\"DEVICE\",\"name\":\"switch\",\"displayName\" : \"Christmas Tree\", " +
+                "\"value\" : \"off\", \"type\" : \"digital\", \"unit\":\"null\",\"deviceId\":34,\"hubId\":0," +
+                "\"installedAppId\":0,\"descriptionText\" : \"null\"}");
+        Helog.run("events", webServer.getHostAndPort());
+
+        List<String> errLines = splitLines(err.getContent());
+        assertThat(errLines.get(1)).contains("Malformed JSON");
+        assertThat(errLines.get(2)).isEqualTo("unparseable");
+
+        List<String> lines = splitLines(out.getContent());
+        assertThat(lines).hasSize(1);
+        assertThat(dropDateTime(lines.get(0))).isEqualTo(" DEVICE 34 Christmas Tree: switch off");
+    }
+
+    @Test
     public void rawSpoolsExact() {
-        webServer.content.add("abc");
-        webServer.content.add("def");
+        webServer.content.add("abcdef");
         Helog.run("events", webServer.getHostAndPort(), "--raw");
-        assertThat(out.getContent()).isEqualTo("abcdef");
+
+        List<String> lines = splitLines(out.getContent());
+        assertThat(lines).containsExactly("abcdef");
     }
 
     @Test
