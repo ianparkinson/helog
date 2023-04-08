@@ -4,6 +4,17 @@
 
 [![Tests](https://github.com/ianparkinson/helog/actions/workflows/check.yml/badge.svg)](https://github.com/ianparkinson/helog/actions/workflows/check.yml?event=push)
 
+* [Installation](#installation)
+* [Usage](#usage)
+* [Debug log](#debug-log)
+  * [CSV output](#csv-output)
+  * [Raw output](#raw-output)
+  * [Filtering](#filtering)
+* [Event log](#event-log)
+    * [CSV output](#csv-output-1)
+    * [Raw output](#raw-output-1)
+    * [Filtering](#filtering-1)
+
 ## Installation
 
 1. You'll need a Java Runtime Environment installed, version 11 or later.
