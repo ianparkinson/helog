@@ -26,6 +26,7 @@ import java.time.ZoneId;
 import java.util.concurrent.Callable;
 
 import static com.github.ianparkinson.helog.util.Strings.csvLine;
+import static java.lang.System.getProperty;
 
 @CommandLine.Command(
         name = "helog",
@@ -170,7 +171,11 @@ public final class Helog implements Callable<Integer> {
         public String[] getVersion() {
             Package pack = Helog.class.getPackage();
             return new String[]{
-                    pack.getImplementationTitle() + " " + pack.getImplementationVersion()
+                    pack.getImplementationTitle() + " " + pack.getImplementationVersion(),
+                    "",
+                    "JVM: " + getProperty("java.version") + " (" +
+                        getProperty("java.vm.vendor") + " " + getProperty("java.vm.version") + ")",
+                    "OS:  " + getProperty("os.name") + " " + getProperty("os.version") + " " + getProperty("os.arch")
             };
         }
     }
