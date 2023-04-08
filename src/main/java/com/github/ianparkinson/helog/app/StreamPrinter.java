@@ -88,7 +88,7 @@ public final class StreamPrinter {
 
                 @Override
                 public void onError(ErrorMessage errorMessage) {
-                    System.err.println(errorMessage);
+                    errorMessage.writeToStderr(ansi);
                     errorLatch.countDown();
                 }
             });
