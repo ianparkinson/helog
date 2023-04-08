@@ -142,7 +142,7 @@ From left-to-right, the fields are:
 > helog events 192.168.1.200 --csv
 Connected to ws://192.168.1.200/eventsocket
 localTime,source,name,displayName,value,type,unit,deviceId,hubId,installedAppId,descriptionText
-2023-04-08T14:06:03.918+01:00,DEVICE,temperature,Bathroom Underfloor Heating,20,,C,36,0,0,
+2023-04-08T14:06:03.918+01:00,DEVICE,temperature,Underfloor Heating,20,,C,36,0,0,
 2023-04-08T14:06:33.670+01:00,DEVICE,switch,Lamp,on,digital,,34,0,0,
 ```
 
