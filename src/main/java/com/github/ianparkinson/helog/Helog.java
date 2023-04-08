@@ -30,8 +30,8 @@ import static java.lang.System.getProperty;
 
 @CommandLine.Command(
         name = "helog",
-        header = Helog.HEADER,
-        synopsisHeading = "Usage:%n",
+        header = {Helog.HEADER, "", Helog.HOME_URL},
+        synopsisHeading = "%nUsage:%n",
         customSynopsis = {
                 "  @|bold helog log|@ @|yellow <host>|@",
                 "  @|bold helog events|@ @|yellow <host>|@"
@@ -42,6 +42,8 @@ public final class Helog implements Callable<Integer> {
 
     static final String HEADER =
             "Writes live logs from a Hubitat Elevation's /logsocket or /eventsocket streams to stdout.";
+    static final String HOME_URL = "https://github.com/ianparkinson/helog";
+
     public static final String ERROR_PREFIX = "Error: ";
 
     @CommandLine.Spec
@@ -88,20 +90,10 @@ public final class Helog implements Callable<Integer> {
                 versionHelp = true,
                 description = "Print version information and exit.")
         public boolean version;
-
-        @Option(names = "--kofi",
-                description = "Buy the author a coffee.",
-                help = true)
-        public boolean kofi;
     }
 
     @Override
     public Integer call() throws URISyntaxException, InterruptedException {
-        if (helpOptions.kofi) {
-            kofi();
-            return 0;
-        }
-
         try {
             filter.validate(stream, format);
         } catch (ParameterValidationException e) {
@@ -136,11 +128,6 @@ public final class Helog implements Callable<Integer> {
                 jsonStream.type(),
                 filter.createPredicate(jsonStream),
                 (dateTime, event) -> csvLine(jsonStream.csvFormatter().format(dateTime, event)));
-    }
-
-    public static void kofi() {
-        System.out.println("Thank you!");
-        System.out.println("https://ko-fi.com/ianparkinson");
     }
 
     public static int run(String... args) {
