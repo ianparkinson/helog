@@ -181,7 +181,7 @@ options. Devices can be specified by either their numeric id or their name, but 
 their numeric id. For example:
 
 ```
-> helog events 192.168.1.200 --device=Lamp,36"
+> helog events 192.168.1.200 --device=Lamp,36
 ```
 
 ...will only display log events emitted from the device with the name `Lamp` and from the device with id 36.
