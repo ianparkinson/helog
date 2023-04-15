@@ -18,7 +18,7 @@
 ## Installation
 
 1. You'll need a Java Runtime Environment installed, version 11 or later.
-1. Download and unpack an archive from the [releases](https://github.com/ianparkinson/helog/releases) page.
+2. Download and unpack an archive from the [releases](https://github.com/ianparkinson/helog/releases) page.
 
 The `helog` command executable can be found inside the `bin` directory of the unpacked archive.
 
@@ -142,22 +142,22 @@ From left-to-right, the fields are:
 > helog events 192.168.1.200 --csv
 Connected to ws://192.168.1.200/eventsocket
 localTime,source,name,displayName,value,type,unit,deviceId,hubId,installedAppId,descriptionText
-2023-04-08T14:06:03.918+01:00,DEVICE,temperature,Underfloor Heating,20,,C,36,0,0,
-2023-04-08T14:06:33.670+01:00,DEVICE,switch,Lamp,on,digital,,34,0,0,
+2023-04-08T14:06:03.918+01:00,DEVICE,temperature,Underfloor Heating,20,null,C,36,0,0,null
+2023-04-08T14:06:33.670+01:00,DEVICE,switch,Lamp,on,digital,null,34,0,0,null
 ```
 
 The fields are:
 * `localTime` - The time at which the event was received by `helog`, using the local clock.
-* `source` - The source type, either `DEVICE` or `APP`.
+* `source` - The source type, usually either `DEVICE` or `APP`.
 * `name` - The name of the event.
-* `displayName` - The name of the source device. Not available for an app.
+* `displayName` - The name of the source device, or `null` for an app.
 * `value` - The value associated with the event.
-* `type` - If available, the event type.
-* `unit` - If available, the units associated with the event value.
-* `deviceId` - The numeric id of the source device. Zero if the event was emitted by an app.
-* `hubId` - A numeric id identifying the hub, typically zero.
-* `installedAppId` - The numeric id of the source app. Zero if the event was emitted by a device.
-* `descriptionText` - If available, a textual description of the event.
+* `type` - The event type, or `null` if not available.
+* `unit` - The units associated with the event value, or `null` if not available.
+* `deviceId` - The numeric id of the source device. Zero if the event was not emitted by a device.
+* `hubId` - A numeric id identifying the hub, usually zero.
+* `installedAppId` - The numeric id of the source app. Zero if the event was not emitted by an app.
+* `descriptionText` - A textual description of the event, or `null` if none.
 
 Most of these fields correspond to columns in the Hubitat Elevation's [Device Events](
 https://docs2.hubitat.com/user-interface/devices/device-events) view.
