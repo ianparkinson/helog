@@ -13,27 +13,27 @@ import java.util.concurrent.CountDownLatch;
 
 import static com.google.common.truth.Truth.assertThat;
 
-public final class TextWebSocketClientImplTest {
+final class TextWebSocketClientImplTest {
     @RegisterExtension
-    public final WebSocketServerExtension webServer = new WebSocketServerExtension();
+    final WebSocketServerExtension webServer = new WebSocketServerExtension();
 
     private final TextWebSocketClientImpl client = new TextWebSocketClientImpl();
     private final RecordingListener listener = new RecordingListener();
 
     @Test
-    public void reportsOpen() throws InterruptedException {
+    void reportsOpen() throws InterruptedException {
         client.connect(uri(), listener);
         assertThat(listener.event(0).eventType).isEqualTo(EventType.OPEN);
     }
 
     @Test
-    public void reportsClose() throws InterruptedException {
+    void reportsClose() throws InterruptedException {
         client.connect(uri(), listener);
         assertThat(listener.event(1).eventType).isEqualTo(EventType.ERROR);
     }
 
     @Test
-    public void reportsData() throws InterruptedException {
+    void reportsData() throws InterruptedException {
         webServer.content.add("foo");
         client.connect(uri(), listener);
         assertThat(listener.event(1).eventType).isEqualTo(EventType.TEXT);
@@ -41,7 +41,7 @@ public final class TextWebSocketClientImplTest {
     }
 
     @Test
-    public void reportsConnectionFailure() throws InterruptedException, IOException {
+    void reportsConnectionFailure() throws InterruptedException, IOException {
         webServer.close();
         client.connect(uri(), listener);
         assertThat(listener.event(0).eventType).isEqualTo(EventType.ERROR);

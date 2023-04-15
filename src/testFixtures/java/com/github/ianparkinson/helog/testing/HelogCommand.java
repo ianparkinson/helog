@@ -34,7 +34,7 @@ public final class HelogCommand {
     /**
      * Encapsulates the result of running a command-line command to completion.
      */
-    public static class Result {
+    public static final class Result {
         /** The exit code with which the command terminated. */
         public final int exitCode;
 

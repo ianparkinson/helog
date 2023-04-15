@@ -115,7 +115,7 @@ public final class EventsJsonStream implements JsonStream<EventsJsonStream.Event
      * <p>Sample content:
      * {@code { "source":"DEVICE","name":"switch","displayName" : "Christmas Tree", "value" : "off", "type" : "digital", "unit":"null","deviceId":34,"hubId":0,"installedAppId":0,"descriptionText" : "null"}}
      */
-    public static class EventEntry {
+    public static final class EventEntry {
         public String source;
         public String name;
         public String displayName;

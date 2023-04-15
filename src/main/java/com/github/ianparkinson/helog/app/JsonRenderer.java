@@ -12,7 +12,7 @@ import java.util.function.Predicate;
  *
  * @param <T> Event type representing an entry in the stream.
  */
-public class JsonRenderer<T> implements Renderer {
+public final class JsonRenderer<T> implements Renderer {
     public static final Gson gson = new Gson();
 
     private final TypeToken<T> jsonTypeToken;

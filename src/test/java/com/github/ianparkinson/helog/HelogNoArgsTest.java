@@ -7,15 +7,15 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 
 import static com.google.common.truth.Truth.assertThat;
 
-public class HelogNoArgsTest {
+final class HelogNoArgsTest {
     @RegisterExtension
-    private final StdOutExtension out = new StdOutExtension();
+    final StdOutExtension out = new StdOutExtension();
 
     @RegisterExtension
-    private final StdErrExtension err = new StdErrExtension();
+    final StdErrExtension err = new StdErrExtension();
 
     @Test
-    public void writesUsageToStderr() {
+    void writesUsageToStderr() {
         Helog.run();
 
         // Check that stderr starts with the Header, not with Picocli's error message. The content sent to stderr
@@ -24,13 +24,13 @@ public class HelogNoArgsTest {
     }
 
     @Test
-    public void stdOutIsEmpty() {
+    void stdOutIsEmpty() {
         Helog.run();
         assertThat(out.getContent()).isEmpty();
     }
 
     @Test
-    public void exitCode() {
+    void exitCode() {
         assertThat(Helog.run()).isEqualTo(2);
     }
 }

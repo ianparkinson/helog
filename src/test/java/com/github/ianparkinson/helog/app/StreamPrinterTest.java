@@ -19,55 +19,54 @@ import static com.github.ianparkinson.helog.testing.TestStrings.splitLines;
 import static com.github.ianparkinson.helog.util.ErrorMessage.errorMessage;
 import static com.google.common.truth.Truth.assertThat;
 
-public class StreamPrinterTest {
+final class StreamPrinterTest {
     private static final ZonedDateTime DATE_TIME = ZonedDateTime.parse("2023-01-28T13:00Z");
-
-    @RegisterExtension
-    public final StdOutExtension out = new StdOutExtension();
-    @RegisterExtension
-    public final StdErrExtension err = new StdErrExtension();
-
     private static final URI uri = URI.create("ws://example.com");
+
+    @RegisterExtension
+    final StdOutExtension out = new StdOutExtension();
+    @RegisterExtension
+    final StdErrExtension err = new StdErrExtension();
 
     private final FakeClock clock = new FakeClock(DATE_TIME);
     private final FakeClient client = new FakeClient();
     private final StreamPrinter printer = new StreamPrinter(clock, CommandLine.Help.Ansi.OFF, client);
 
     @Test
-    public void connectsToUri() {
+    void connectsToUri() {
         printer.stream(uri, null, (dateTime, text) -> text);
         assertThat(client.uri).isEqualTo(uri);
     }
 
     @Test
-    public void signalsConnected() {
+    void signalsConnected() {
         printer.stream(uri, null, (dateTime, text) -> text);
         client.listener.onOpen();
         assertThat(splitLines(err.getContent())).containsExactly("Connected to " + uri);
     }
 
     @Test
-    public void noHeader() {
+    void noHeader() {
         printer.stream(uri, null, (dateTime, text) -> text);
         client.listener.onOpen();
         assertThat(out.getContent()).isEmpty();
     }
 
     @Test
-    public void noHeaderBeforeConnected() {
+    void noHeaderBeforeConnected() {
         printer.stream(uri, "Some Header", (dateTime, text) -> text);
         assertThat(out.getContent()).isEmpty();
     }
 
     @Test
-    public void writesHeaderWhenConnected() {
+    void writesHeaderWhenConnected() {
         printer.stream(uri, "Some Header", (dateTime, text) -> text);
         client.listener.onOpen();
         assertThat(splitLines(out.getContent())).containsExactly("Some Header");
     }
 
     @Test
-    public void formatsText() {
+    void formatsText() {
         printer.stream(uri, null, (dateTime, text) -> text.toUpperCase());
         client.listener.onOpen();
         client.listener.onText("some text", true);
@@ -76,7 +75,7 @@ public class StreamPrinterTest {
     }
 
     @Test
-    public void combinesPartialTextEvents() {
+    void combinesPartialTextEvents() {
         printer.stream(uri, null, (dateTime, text) -> text.toUpperCase());
         client.listener.onOpen();
         client.listener.onText("some ", false);
@@ -86,7 +85,7 @@ public class StreamPrinterTest {
     }
 
     @Test
-    public void multipleTextEvents() {
+    void multipleTextEvents() {
         printer.stream(uri, null, (dateTime, text) -> text.toUpperCase());
         client.listener.onOpen();
         client.listener.onText("some", true);
@@ -96,7 +95,7 @@ public class StreamPrinterTest {
     }
 
     @Test
-    public void textEventFollowingSplitText() {
+    void textEventFollowingSplitText() {
         printer.stream(uri, null, (dateTime, text) -> text.toUpperCase());
         client.listener.onOpen();
         client.listener.onText("some ", false);
@@ -107,7 +106,7 @@ public class StreamPrinterTest {
     }
 
     @Test
-    public void filtersEvent() {
+    void filtersEvent() {
         StreamPrinter.Renderer renderer = (dateTime, text) -> {
             if (text.contains("no")) {
                 return null;
@@ -125,7 +124,7 @@ public class StreamPrinterTest {
     }
 
     @Test
-    public void providesTimestamp() {
+    void providesTimestamp() {
         printer.stream(uri, null, (dateTime, text) -> dateTime.toString());
         client.listener.onOpen();
         client.listener.onText("text", true);
@@ -134,7 +133,7 @@ public class StreamPrinterTest {
     }
 
     @Test
-    public void updatesTimestamp() {
+    void updatesTimestamp() {
         printer.stream(uri, null, (dateTime, text) -> dateTime.toString());
         client.listener.onOpen();
         client.listener.onText("text", true);
@@ -147,7 +146,7 @@ public class StreamPrinterTest {
     }
 
     @Test
-    public void usesEarliestTimestampOfSplitEvents() {
+    void usesEarliestTimestampOfSplitEvents() {
         printer.stream(uri, null, (dateTime, text) -> dateTime.toString());
         client.listener.onOpen();
         client.listener.onText("text", false);
@@ -160,7 +159,7 @@ public class StreamPrinterTest {
     }
 
     @Test
-    public void reportsJsonSyntaxException() {
+    void reportsJsonSyntaxException() {
         StreamPrinter.Renderer renderer = (dateTime, text) -> {
             if (text.contains("bad")) {
                 throw new JsonSyntaxException("test exception");
@@ -184,7 +183,7 @@ public class StreamPrinterTest {
     }
 
     @Test
-    public void reportsConnectionError() {
+    void reportsConnectionError() {
         printer.stream(uri, null, (dateTime, text) -> text);
         client.listener.onError(errorMessage("test error"));
         assertThat(splitLines(out.getContent())).isEmpty();
@@ -192,7 +191,7 @@ public class StreamPrinterTest {
     }
 
     @Test
-    public void reportsErrorAfterConnection() {
+    void reportsErrorAfterConnection() {
         printer.stream(uri, null, (dateTime, text) -> text);
         client.listener.onOpen();
         client.listener.onError(errorMessage("test error"));

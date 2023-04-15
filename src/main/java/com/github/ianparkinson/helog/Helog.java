@@ -80,7 +80,7 @@ public final class Helog implements Callable<Integer> {
     @ArgGroup(heading = "Help:%n")
     public HelpOptions helpOptions = new HelpOptions();
 
-    public static class HelpOptions {
+    public static final class HelpOptions {
         @Option(names = { "-h", "--help" },
                 usageHelp = true,
                 description = "Show this help message and exit.")
@@ -177,7 +177,7 @@ public final class Helog implements Callable<Integer> {
      *   --device=<device>[,<device>...], --xdevice=<device>[,<device>...]
      * </pre>
      */
-    private static class HelpFactory implements CommandLine.IHelpFactory {
+    private static final class HelpFactory implements CommandLine.IHelpFactory {
         @Override
         public Help create(
                 CommandLine.Model.CommandSpec commandSpec,

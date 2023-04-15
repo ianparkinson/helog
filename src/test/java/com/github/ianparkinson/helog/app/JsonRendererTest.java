@@ -9,12 +9,12 @@ import java.time.ZonedDateTime;
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.Assert.assertThrows;
 
-public class JsonRendererTest {
+final class JsonRendererTest {
 
     private static final ZonedDateTime DATE_TIME = ZonedDateTime.parse("2023-01-28T13:00Z");
 
     @Test
-    public void parsesAndFormats() {
+    void parsesAndFormats() {
         JsonRenderer<TestEntry> renderer =
                 new JsonRenderer<>(TypeToken.get(TestEntry.class), entry -> true, TestEntry::format);
         assertThat(renderer.render(DATE_TIME, "{\"name\": \"foo\", \"value\": 42}"))
@@ -22,7 +22,7 @@ public class JsonRendererTest {
     }
 
     @Test
-    public void filters() {
+    void filters() {
         JsonRenderer<TestEntry> renderer =
                 new JsonRenderer<>(TypeToken.get(TestEntry.class), (entry) -> entry.value == 42, TestEntry::format);
         assertThat(renderer.render(DATE_TIME, "{\"name\": \"foo\", \"value\": 42}")).isNotNull();
@@ -30,15 +30,13 @@ public class JsonRendererTest {
     }
 
     @Test
-    public void jsonSyntaxException() {
+    void jsonSyntaxException() {
         JsonRenderer<TestEntry> renderer =
                 new JsonRenderer<>(TypeToken.get(TestEntry.class), entry -> true, TestEntry::format);
-        assertThrows(JsonSyntaxException.class, () -> {
-           renderer.render(DATE_TIME, "this is not a JSON string");
-        });
+        assertThrows(JsonSyntaxException.class, () -> renderer.render(DATE_TIME, "this is not a JSON string"));
     }
 
-    private static class TestEntry {
+    private static final class TestEntry {
         public String name;
         public int value;
 

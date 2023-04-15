@@ -13,8 +13,6 @@ import static com.github.ianparkinson.helog.util.ErrorMessage.errorMessage;
 
 /**
  * Reads a stream of events from a URI, filters them, formats them, and writes them to stdout.
- *
- * <p>Forms the main loop for Helog, and blocks until the connection fails.
  */
 public final class StreamPrinter {
     private final Clock clock;
@@ -30,6 +28,9 @@ public final class StreamPrinter {
     /**
      * Read a stream of events from a URI, filters them, formats them and writes them to stdout.
      *
+     * <p>Returns immediately, and runs concurrently as events are supplied on a thread controlled by the websocket.
+     * The returned {@link Streamer} object provides a means to block until the websocket is closed.
+     *
      * @param uri The {@link URI} to connect to.
      * @param header A line which will be printed after connecting, but before any events.
      * @param renderer Filters and formats the raw data received from the server.
@@ -40,7 +41,7 @@ public final class StreamPrinter {
         return streamer;
     }
 
-    public class Streamer {
+    public final class Streamer {
         private final URI uri;
         private final String header;
         private final Renderer renderer;
@@ -95,7 +96,7 @@ public final class StreamPrinter {
         }
 
         /**
-         * Blocks until the connection fails.
+         * Blocks the current thread until the connection fails.
          */
         public void waitUntilError() throws InterruptedException {
             errorLatch.await();

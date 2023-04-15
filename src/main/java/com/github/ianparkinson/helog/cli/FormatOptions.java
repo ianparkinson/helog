@@ -5,7 +5,7 @@ import picocli.CommandLine.Option;
 /**
  * Encapsulates options controlling the output format.
  */
-public class FormatOptions {
+public final class FormatOptions {
     @Option(names = {"-r", "--raw"},
             description = "Write the stream exactly as received from the Hubitat Elevation.")
     public boolean raw;

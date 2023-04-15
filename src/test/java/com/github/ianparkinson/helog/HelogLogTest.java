@@ -14,30 +14,30 @@ import static com.github.ianparkinson.helog.testing.TestStrings.dropDateTime;
 import static com.github.ianparkinson.helog.testing.TestStrings.splitLines;
 import static com.google.common.truth.Truth.assertThat;
 
-public final class HelogLogTest {
+final class HelogLogTest {
     @RegisterExtension
-    private final WebSocketServerExtension webServer = new WebSocketServerExtension();
+    final WebSocketServerExtension webServer = new WebSocketServerExtension();
     @RegisterExtension
-    private final StdOutExtension out = new StdOutExtension();
+    final StdOutExtension out = new StdOutExtension();
     @RegisterExtension
-    private final StdErrExtension err = new StdErrExtension();
+    final StdErrExtension err = new StdErrExtension();
 
     @Test
-    public void connectsToLogSocket() throws InterruptedException {
+    void connectsToLogSocket() throws InterruptedException {
         Helog.run("log", webServer.getHostAndPort());
         RecordedRequest request = webServer.takeRequest();
         assertThat(request.getPath()).isEqualTo("/logsocket");
     }
 
     @Test
-    public void reportsConnection() {
+    void reportsConnection() {
         Helog.run("log", webServer.getHostAndPort());
         assertThat(splitLines(err.getContent()).get(0)).isEqualTo(
                 "Connected to ws://" + webServer.getHostAndPort() + "/logsocket");
     }
 
     @Test
-    public void writesFormattedJson() {
+    void writesFormattedJson() {
         webServer.content.add("{\"name\":\"Christmas Tree\",\"msg\":\"setSysinfo: led:off\",\"id\":34, " +
                 "\"time\":\"2022-11-05 16:25:52.729\",\"type\":\"dev\",\"level\":\"info\"}");
         Helog.run("log", webServer.getHostAndPort());
@@ -48,7 +48,7 @@ public final class HelogLogTest {
     }
 
     @Test
-    public void filterIncludeDevice() {
+    void filterIncludeDevice() {
         webServer.content.add("{\"name\":\"MatchByName\",\"msg\":\"msg\",\"id\":34, " +
                 "\"time\":\"2022-11-05 16:25:52.729\",\"type\":\"dev\",\"level\":\"info\"}");
         webServer.content.add("{\"name\":\"OtherDevice\",\"msg\":\"msg\",\"id\":35, " +
@@ -67,7 +67,7 @@ public final class HelogLogTest {
     }
 
     @Test
-    public void filterExcludeDevice() {
+    void filterExcludeDevice() {
         webServer.content.add("{\"name\":\"MatchByName\",\"msg\":\"msg\",\"id\":34, " +
                 "\"time\":\"2022-11-05 16:25:52.729\",\"type\":\"dev\",\"level\":\"info\"}");
         webServer.content.add("{\"name\":\"OtherDevice\",\"msg\":\"msg\",\"id\":35, " +
@@ -86,7 +86,7 @@ public final class HelogLogTest {
     }
 
     @Test
-    public void filterIncludeApp() {
+    void filterIncludeApp() {
         webServer.content.add("{\"name\":\"MatchByName\",\"msg\":\"msg\",\"id\":34, " +
                 "\"time\":\"2022-11-05 16:25:52.729\",\"type\":\"app\",\"level\":\"info\"}");
         webServer.content.add("{\"name\":\"OtherApp\",\"msg\":\"msg\",\"id\":35, " +
@@ -103,7 +103,7 @@ public final class HelogLogTest {
     }
 
     @Test
-    public void filterExcludeApp() {
+    void filterExcludeApp() {
         webServer.content.add("{\"name\":\"MatchByName\",\"msg\":\"msg\",\"id\":34, " +
                 "\"time\":\"2022-11-05 16:25:52.729\",\"type\":\"app\",\"level\":\"info\"}");
         webServer.content.add("{\"name\":\"OtherApp\",\"msg\":\"msg\",\"id\":35, " +
@@ -120,7 +120,7 @@ public final class HelogLogTest {
     }
 
     @Test
-    public void filterIncludeLogLevel() {
+    void filterIncludeLogLevel() {
         webServer.content.add("{\"name\":\"FirstMatch\",\"msg\":\"msg\",\"id\":34, " +
                 "\"time\":\"2022-11-05 16:25:52.729\",\"type\":\"app\",\"level\":\"info\"}");
         webServer.content.add("{\"name\":\"NoMatch\",\"msg\":\"msg\",\"id\":35, " +
@@ -135,7 +135,7 @@ public final class HelogLogTest {
     }
 
     @Test
-    public void filterExcludeLogLevel() {
+    void filterExcludeLogLevel() {
         webServer.content.add("{\"name\":\"FirstMatch\",\"msg\":\"msg\",\"id\":34, " +
                 "\"time\":\"2022-11-05 16:25:52.729\",\"type\":\"app\",\"level\":\"info\"}");
         webServer.content.add("{\"name\":\"NoMatch\",\"msg\":\"msg\",\"id\":35, " +
@@ -149,7 +149,7 @@ public final class HelogLogTest {
     }
 
     @Test
-    public void writesInCsvFormat() {
+    void writesInCsvFormat() {
         webServer.content.add("{\"name\":\"Christmas Tree\",\"msg\":\"setSysinfo: led:off\",\"id\":34, " +
                 "\"time\":\"2022-11-05 16:25:52.729\",\"type\":\"dev\",\"level\":\"info\"}");
         Helog.run("log", webServer.getHostAndPort(), "--csv");
@@ -161,7 +161,7 @@ public final class HelogLogTest {
     }
 
     @Test
-    public void toleratesMalformedJson() {
+    void toleratesMalformedJson() {
         webServer.content.add("unparseable");
         webServer.content.add("{\"name\":\"Christmas Tree\",\"msg\":\"setSysinfo: led:off\",\"id\":34, " +
                 "\"time\":\"2022-11-05 16:25:52.729\",\"type\":\"dev\",\"level\":\"info\"}");
@@ -177,7 +177,7 @@ public final class HelogLogTest {
     }
 
     @Test
-    public void rawSpoolsExact() {
+    void rawSpoolsExact() {
         webServer.content.add("abcdef");
         Helog.run("log", webServer.getHostAndPort(), "--raw");
 
@@ -186,21 +186,21 @@ public final class HelogLogTest {
     }
 
     @Test
-    public void rawAndCsvMutuallyExclusive() {
+    void rawAndCsvMutuallyExclusive() {
         int code = Helog.run("log", webServer.getHostAndPort(), "--raw", "--csv");
         assertThat(err.getContent()).startsWith(ERROR_PREFIX);
         assertThat(code).isEqualTo(2);
     }
 
     @Test
-    public void filterValidationFailureHandled() {
+    void filterValidationFailureHandled() {
         int code = Helog.run("log", webServer.getHostAndPort(), "--raw", "--device=42");
         assertThat(err.getContent()).startsWith(ERROR_PREFIX);
         assertThat(code).isEqualTo(2);
     }
 
     @Test
-    public void exitCode1() {
+    void exitCode1() {
         assertThat(Helog.run("log", webServer.getHostAndPort())).isEqualTo(1);
     }
 }

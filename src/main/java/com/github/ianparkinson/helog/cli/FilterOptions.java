@@ -11,7 +11,7 @@ import java.util.function.Predicate;
 /**
  * Encapsulates options allowing the logged events to be filtered.
  */
-public class FilterOptions {
+public final class FilterOptions {
     @Option(names = "--device",
             split = ",",
             description = "Include (or exclude) specific devices, specified using either the numeric id or the full " +

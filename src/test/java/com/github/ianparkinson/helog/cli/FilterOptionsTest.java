@@ -14,7 +14,7 @@ import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class FilterOptionsTest {
+final class FilterOptionsTest {
     private static final TestEntry ENTRY_A = new TestEntry("deviceA", "appA", "nameA", "info");
     private static final TestEntry ENTRY_B = new TestEntry("deviceB", "appB", "nameB", "debug");
     private static final TestEntry ENTRY_C = new TestEntry("deviceC", "appC", "nameC", "trace");
@@ -24,49 +24,49 @@ public class FilterOptionsTest {
     private final TestJsonStream stream = new TestJsonStream();
 
     @Test
-    public void validate_rawDisallowsDevice() {
+    void validate_rawDisallowsDevice() {
         formatOptions.raw = true;
         filterOptions.device = List.of("42");
         assertThrows(ParameterValidationException.class, () -> filterOptions.validate(Stream.log, formatOptions));
     }
 
     @Test
-    public void validate_rawDisallowsExcludeDevice() {
+    void validate_rawDisallowsExcludeDevice() {
         formatOptions.raw = true;
         filterOptions.excludeDevice = List.of("42");
         assertThrows(ParameterValidationException.class, () -> filterOptions.validate(Stream.log, formatOptions));
     }
 
     @Test
-    public void validate_rawDisallowsApp() {
+    void validate_rawDisallowsApp() {
         formatOptions.raw = true;
         filterOptions.app = List.of("42");
         assertThrows(ParameterValidationException.class, () -> filterOptions.validate(Stream.log, formatOptions));
     }
 
     @Test
-    public void validate_rawDisallowsExcludeApp() {
+    void validate_rawDisallowsExcludeApp() {
         formatOptions.raw = true;
         filterOptions.excludeApp = List.of("42");
         assertThrows(ParameterValidationException.class, () -> filterOptions.validate(Stream.log, formatOptions));
     }
 
     @Test
-    public void validate_rawDisallowsName() {
+    void validate_rawDisallowsName() {
         formatOptions.raw = true;
         filterOptions.name = List.of("name");
         assertThrows(ParameterValidationException.class, () -> filterOptions.validate(Stream.events, formatOptions));
     }
 
     @Test
-    public void validate_rawDisallowsExcludeName() {
+    void validate_rawDisallowsExcludeName() {
         formatOptions.raw = true;
         filterOptions.excludeName = List.of("name");
         assertThrows(ParameterValidationException.class, () -> filterOptions.validate(Stream.events, formatOptions));
     }
 
     @Test
-    public void validate_rawDisallowsLevel() {
+    void validate_rawDisallowsLevel() {
         formatOptions.raw = true;
         filterOptions.level = List.of(LogLevel.info);
         assertThrows(ParameterValidationException.class, () -> filterOptions.validate(Stream.log, formatOptions));
@@ -74,14 +74,14 @@ public class FilterOptionsTest {
 
 
     @Test
-    public void validate_rawDisallowsExcludeLevel() {
+    void validate_rawDisallowsExcludeLevel() {
         formatOptions.raw = true;
         filterOptions.excludeLevel = List.of(LogLevel.info);
         assertThrows(ParameterValidationException.class, () -> filterOptions.validate(Stream.log, formatOptions));
     }
 
     @Test
-    public void validate_csvAllowsInclusiveSourceFilters() {
+    void validate_csvAllowsInclusiveSourceFilters() {
         formatOptions.csv = true;
         filterOptions.app = List.of("42");
         filterOptions.device = List.of("42");
@@ -89,7 +89,7 @@ public class FilterOptionsTest {
     }
 
     @Test
-    public void validate_csvAllowsExclusiveSourceFilters() {
+    void validate_csvAllowsExclusiveSourceFilters() {
         formatOptions.csv = true;
         filterOptions.excludeApp = List.of("42");
         filterOptions.excludeDevice = List.of("42");
@@ -97,201 +97,201 @@ public class FilterOptionsTest {
     }
 
     @Test
-    public void validate_csvAllowsInclusiveNameFilter() {
+    void validate_csvAllowsInclusiveNameFilter() {
         formatOptions.csv = true;
         filterOptions.name = List.of("name");
         assertDoesNotThrow(() -> filterOptions.validate(Stream.events, formatOptions));
     }
 
     @Test
-    public void validate_csvAllowsExclusiveNameFilter() {
+    void validate_csvAllowsExclusiveNameFilter() {
         formatOptions.csv = true;
         filterOptions.excludeName = List.of("name");
         assertDoesNotThrow(() -> filterOptions.validate(Stream.events, formatOptions));
     }
 
     @Test
-    public void validate_csvAllowsLevel() {
+    void validate_csvAllowsLevel() {
         formatOptions.csv = true;
         filterOptions.level = List.of(LogLevel.info);
         assertDoesNotThrow(() -> filterOptions.validate(Stream.log, formatOptions));
     }
 
     @Test
-    public void validate_csvAllowsExcludeLevel() {
+    void validate_csvAllowsExcludeLevel() {
         formatOptions.csv = true;
         filterOptions.excludeLevel = List.of(LogLevel.info);
         assertDoesNotThrow(() -> filterOptions.validate(Stream.log, formatOptions));
     }
 
     @Test
-    public void validate_logAllowsInclusiveSourceFiltersByNumber() {
+    void validate_logAllowsInclusiveSourceFiltersByNumber() {
         filterOptions.app = List.of("42");
         filterOptions.device = List.of("42");
         assertDoesNotThrow(() -> filterOptions.validate(Stream.log, formatOptions));
     }
 
     @Test
-    public void validate_logAllowsExclusiveSourceFiltersByNumber() {
+    void validate_logAllowsExclusiveSourceFiltersByNumber() {
         filterOptions.excludeApp = List.of("42");
         filterOptions.excludeDevice = List.of("42");
         assertDoesNotThrow(() -> filterOptions.validate(Stream.log, formatOptions));
     }
 
     @Test
-    public void validate_logDisallowsName() {
+    void validate_logDisallowsName() {
         filterOptions.name = List.of("name");
         assertThrows(ParameterValidationException.class, () -> filterOptions.validate(Stream.log, formatOptions));
     }
 
     @Test
-    public void validate_logDisallowsExcludeName() {
+    void validate_logDisallowsExcludeName() {
         filterOptions.excludeName = List.of("name");
         assertThrows(ParameterValidationException.class, () -> filterOptions.validate(Stream.log, formatOptions));
     }
 
     @Test
-    public void validate_logAllowsLevel() {
+    void validate_logAllowsLevel() {
         filterOptions.level = List.of(LogLevel.info);
         assertDoesNotThrow(() -> filterOptions.validate(Stream.log, formatOptions));
     }
 
     @Test
-    public void validate_logAllowsExcludeLevel() {
+    void validate_logAllowsExcludeLevel() {
         filterOptions.excludeLevel = List.of(LogLevel.info);
         assertDoesNotThrow(() -> filterOptions.validate(Stream.log, formatOptions));
     }
 
     @Test
-    public void validate_eventsAllowsInclusiveSourceFiltersByNumber() {
+    void validate_eventsAllowsInclusiveSourceFiltersByNumber() {
         filterOptions.app = List.of("42");
         filterOptions.device = List.of("42");
         assertDoesNotThrow(() -> filterOptions.validate(Stream.events, formatOptions));
     }
 
     @Test
-    public void validate_eventsAllowsExclusiveSourceFiltersByNumber() {
+    void validate_eventsAllowsExclusiveSourceFiltersByNumber() {
         filterOptions.excludeApp = List.of("42");
         filterOptions.excludeDevice = List.of("42");
         assertDoesNotThrow(() -> filterOptions.validate(Stream.events, formatOptions));
     }
 
     @Test
-    public void validate_eventsAllowsInclusiveNameFilter() {
+    void validate_eventsAllowsInclusiveNameFilter() {
         filterOptions.name = List.of("name");
         assertDoesNotThrow(() -> filterOptions.validate(Stream.events, formatOptions));
     }
 
     @Test
-    public void validate_eventsAllowsExclusiveNameFilter() {
+    void validate_eventsAllowsExclusiveNameFilter() {
         filterOptions.excludeName = List.of("name");
         assertDoesNotThrow(() -> filterOptions.validate(Stream.events, formatOptions));
     }
 
     @Test
-    public void validate_eventsDisallowsInclusiveLevelFilter() {
+    void validate_eventsDisallowsInclusiveLevelFilter() {
         filterOptions.level = List.of(LogLevel.info);
         assertThrows(ParameterValidationException.class, () -> filterOptions.validate(Stream.events, formatOptions));
     }
 
     @Test
-    public void validate_eventsDisallowsExclusiveLevelFilter() {
+    void validate_eventsDisallowsExclusiveLevelFilter() {
         filterOptions.excludeLevel = List.of(LogLevel.info);
         assertThrows(ParameterValidationException.class, () -> filterOptions.validate(Stream.events, formatOptions));
     }
 
     @Test
-    public void validate_disallowsInclusiveAndExclusiveDeviceFilters() {
+    void validate_disallowsInclusiveAndExclusiveDeviceFilters() {
         filterOptions.device = List.of("42");
         filterOptions.excludeDevice = List.of("43");
         assertThrows(ParameterValidationException.class, () -> filterOptions.validate(Stream.log, formatOptions));
     }
 
     @Test
-    public void validate_disallowsInclusiveAndExclusiveAppFilters() {
+    void validate_disallowsInclusiveAndExclusiveAppFilters() {
         filterOptions.app = List.of("42");
         filterOptions.excludeApp = List.of("43");
         assertThrows(ParameterValidationException.class, () -> filterOptions.validate(Stream.log, formatOptions));
     }
 
     @Test
-    public void validate_disallowsInclusiveDeviceAndExclusiveAppFilters() {
+    void validate_disallowsInclusiveDeviceAndExclusiveAppFilters() {
         filterOptions.device = List.of("42");
         filterOptions.excludeApp = List.of("43");
         assertThrows(ParameterValidationException.class, () -> filterOptions.validate(Stream.log, formatOptions));
     }
 
     @Test
-    public void validate_disallowsExclusiveDeviceAndInclusiveAppFilters() {
+    void validate_disallowsExclusiveDeviceAndInclusiveAppFilters() {
         filterOptions.excludeDevice = List.of("42");
         filterOptions.app = List.of("43");
         assertThrows(ParameterValidationException.class, () -> filterOptions.validate(Stream.log, formatOptions));
     }
 
     @Test
-    public void validate_logAllowsInclusiveAppName() {
+    void validate_logAllowsInclusiveAppName() {
         filterOptions.app = List.of("name");
         assertDoesNotThrow(() -> filterOptions.validate(Stream.log, formatOptions));
     }
 
     @Test
-    public void validate_logAllowsExclusiveAppName() {
+    void validate_logAllowsExclusiveAppName() {
         filterOptions.excludeApp = List.of("name");
         assertDoesNotThrow(() -> filterOptions.validate(Stream.log, formatOptions));
     }
 
     @Test
-    public void validate_logAllowsInclusiveDeviceName() {
+    void validate_logAllowsInclusiveDeviceName() {
         filterOptions.device = List.of("name");
         assertDoesNotThrow(() -> filterOptions.validate(Stream.log, formatOptions));
     }
 
     @Test
-    public void validate_logAllowsExclusiveDeviceName() {
+    void validate_logAllowsExclusiveDeviceName() {
         filterOptions.excludeDevice = List.of("name");
         assertDoesNotThrow(() -> filterOptions.validate(Stream.log, formatOptions));
     }
 
     @Test
-    public void validate_eventsDisallowsInclusiveAppName() {
+    void validate_eventsDisallowsInclusiveAppName() {
         filterOptions.app = List.of("name");
         assertThrows(ParameterValidationException.class, () -> filterOptions.validate(Stream.events, formatOptions));
     }
 
     @Test
-    public void validate_eventsDisallowsExclusiveAppName() {
+    void validate_eventsDisallowsExclusiveAppName() {
         filterOptions.excludeApp = List.of("name");
         assertThrows(ParameterValidationException.class, () -> filterOptions.validate(Stream.events, formatOptions));
     }
 
     @Test
-    public void validate_eventsAllowsInclusiveDeviceName() {
+    void validate_eventsAllowsInclusiveDeviceName() {
         filterOptions.device = List.of("name");
         assertDoesNotThrow(() -> filterOptions.validate(Stream.events, formatOptions));
     }
 
     @Test
-    public void validate_eventsAllowsExclusiveDeviceName() {
+    void validate_eventsAllowsExclusiveDeviceName() {
         filterOptions.excludeDevice = List.of("name");
         assertDoesNotThrow(() -> filterOptions.validate(Stream.events, formatOptions));
     }
 
     @Test
-    public void validate_disallowsInclusiveAndExclusiveNameFilters() {
+    void validate_disallowsInclusiveAndExclusiveNameFilters() {
         filterOptions.name = List.of("name1");
         filterOptions.excludeName = List.of("name2");
         assertThrows(ParameterValidationException.class, () -> filterOptions.validate(Stream.events, formatOptions));
     }
 
     @Test
-    public void validate_disallowsInclusiveAndExclusiveLevelFilters() {
+    void validate_disallowsInclusiveAndExclusiveLevelFilters() {
         filterOptions.level = List.of(LogLevel.debug);
         filterOptions.excludeLevel = List.of(LogLevel.info);
         assertThrows(ParameterValidationException.class, () -> filterOptions.validate(Stream.log, formatOptions));
     }
 
     @Test
-    public void createPredicate_noFilters() {
+    void createPredicate_noFilters() {
         Predicate<TestEntry> predicate = filterOptions.createPredicate(stream);
         assertThat(predicate.test(ENTRY_A)).isTrue();
         assertThat(predicate.test(ENTRY_B)).isTrue();
@@ -299,7 +299,7 @@ public class FilterOptionsTest {
     }
 
     @Test
-    public void createPredicate_device() {
+    void createPredicate_device() {
         filterOptions.device = List.of("deviceB");
         Predicate<TestEntry> predicate = filterOptions.createPredicate(stream);
         assertThat(predicate.test(ENTRY_A)).isFalse();
@@ -308,7 +308,7 @@ public class FilterOptionsTest {
     }
 
     @Test
-    public void createPredicate_multipleDevices() {
+    void createPredicate_multipleDevices() {
         filterOptions.device = List.of("deviceA", "deviceC");
         Predicate<TestEntry> predicate = filterOptions.createPredicate(stream);
         assertThat(predicate.test(ENTRY_A)).isTrue();
@@ -317,7 +317,7 @@ public class FilterOptionsTest {
     }
 
     @Test
-    public void createPredicate_excludeDevice() {
+    void createPredicate_excludeDevice() {
         filterOptions.excludeDevice = List.of("deviceB");
         Predicate<TestEntry> predicate = filterOptions.createPredicate(stream);
         assertThat(predicate.test(ENTRY_A)).isTrue();
@@ -326,7 +326,7 @@ public class FilterOptionsTest {
     }
 
     @Test
-    public void createPredicate_excludeMultipleDevices() {
+    void createPredicate_excludeMultipleDevices() {
         filterOptions.excludeDevice = List.of("deviceA", "deviceC");
         Predicate<TestEntry> predicate = filterOptions.createPredicate(stream);
         assertThat(predicate.test(ENTRY_A)).isFalse();
@@ -335,7 +335,7 @@ public class FilterOptionsTest {
     }
 
     @Test
-    public void createPredicate_app() {
+    void createPredicate_app() {
         filterOptions.app = List.of("appB");
         Predicate<TestEntry> predicate = filterOptions.createPredicate(stream);
         assertThat(predicate.test(ENTRY_A)).isFalse();
@@ -344,7 +344,7 @@ public class FilterOptionsTest {
     }
 
     @Test
-    public void createPredicate_multipleApps() {
+    void createPredicate_multipleApps() {
         filterOptions.app = List.of("appA", "appC");
         Predicate<TestEntry> predicate = filterOptions.createPredicate(stream);
         assertThat(predicate.test(ENTRY_A)).isTrue();
@@ -353,7 +353,7 @@ public class FilterOptionsTest {
     }
 
     @Test
-    public void createPredicate_excludeApp() {
+    void createPredicate_excludeApp() {
         filterOptions.excludeApp = List.of("appB");
         Predicate<TestEntry> predicate = filterOptions.createPredicate(stream);
         assertThat(predicate.test(ENTRY_A)).isTrue();
@@ -362,7 +362,7 @@ public class FilterOptionsTest {
     }
 
     @Test
-    public void createPredicate_excludeMultipleApps() {
+    void createPredicate_excludeMultipleApps() {
         filterOptions.excludeApp = List.of("appA", "appC");
         Predicate<TestEntry> predicate = filterOptions.createPredicate(stream);
         assertThat(predicate.test(ENTRY_A)).isFalse();
@@ -371,7 +371,7 @@ public class FilterOptionsTest {
     }
 
     @Test
-    public void createPredicate_includeDeviceAndApp() {
+    void createPredicate_includeDeviceAndApp() {
         filterOptions.app = List.of("appA");
         filterOptions.device = List.of("deviceC");
         Predicate<TestEntry> predicate = filterOptions.createPredicate(stream);
@@ -381,7 +381,7 @@ public class FilterOptionsTest {
     }
 
     @Test
-    public void createPredicate_excludeDeviceAndApp() {
+    void createPredicate_excludeDeviceAndApp() {
         filterOptions.excludeApp = List.of("appA");
         filterOptions.excludeDevice = List.of("deviceC");
         Predicate<TestEntry> predicate = filterOptions.createPredicate(stream);
@@ -391,7 +391,7 @@ public class FilterOptionsTest {
     }
 
     @Test
-    public void createPredicate_name() {
+    void createPredicate_name() {
         filterOptions.name = List.of("nameB");
         Predicate<TestEntry> predicate = filterOptions.createPredicate(stream);
         assertThat(predicate.test(ENTRY_A)).isFalse();
@@ -400,7 +400,7 @@ public class FilterOptionsTest {
     }
 
     @Test
-    public void createPredicate_multipleNames() {
+    void createPredicate_multipleNames() {
         filterOptions.name = List.of("nameA", "nameC");
         Predicate<TestEntry> predicate = filterOptions.createPredicate(stream);
         assertThat(predicate.test(ENTRY_A)).isTrue();
@@ -409,7 +409,7 @@ public class FilterOptionsTest {
     }
 
     @Test
-    public void createPredicate_excludeName() {
+    void createPredicate_excludeName() {
         filterOptions.excludeName = List.of("nameB");
         Predicate<TestEntry> predicate = filterOptions.createPredicate(stream);
         assertThat(predicate.test(ENTRY_A)).isTrue();
@@ -418,7 +418,7 @@ public class FilterOptionsTest {
     }
 
     @Test
-    public void createPredicate_excludeMultipleNames() {
+    void createPredicate_excludeMultipleNames() {
         filterOptions.excludeName = List.of("nameA", "nameC");
         Predicate<TestEntry> predicate = filterOptions.createPredicate(stream);
         assertThat(predicate.test(ENTRY_A)).isFalse();
@@ -427,7 +427,7 @@ public class FilterOptionsTest {
     }
 
     @Test
-    public void createPredicate_includeSourceIncludeName() {
+    void createPredicate_includeSourceIncludeName() {
         filterOptions.device = List.of("deviceA", "deviceB");
         filterOptions.name = List.of("nameB", "nameC");
         Predicate<TestEntry> predicate = filterOptions.createPredicate(stream);
@@ -437,7 +437,7 @@ public class FilterOptionsTest {
     }
 
     @Test
-    public void createPredicate_includeSourceExcludeName() {
+    void createPredicate_includeSourceExcludeName() {
         filterOptions.device = List.of("deviceA", "deviceB");
         filterOptions.excludeName = List.of("nameB", "nameC");
         Predicate<TestEntry> predicate = filterOptions.createPredicate(stream);
@@ -447,7 +447,7 @@ public class FilterOptionsTest {
     }
 
     @Test
-    public void createPredicate_excludeSourceIncludeName() {
+    void createPredicate_excludeSourceIncludeName() {
         filterOptions.excludeDevice = List.of("deviceA", "deviceB");
         filterOptions.name = List.of("nameB", "nameC");
         Predicate<TestEntry> predicate = filterOptions.createPredicate(stream);
@@ -457,7 +457,7 @@ public class FilterOptionsTest {
     }
 
     @Test
-    public void createPredicate_excludeSourceExcludeName() {
+    void createPredicate_excludeSourceExcludeName() {
         filterOptions.excludeDevice = List.of("deviceA");
         filterOptions.excludeName = List.of("nameC");
         Predicate<TestEntry> predicate = filterOptions.createPredicate(stream);
@@ -468,7 +468,7 @@ public class FilterOptionsTest {
 
 
     @Test
-    public void createPredicate_level() {
+    void createPredicate_level() {
         filterOptions.level = List.of(LogLevel.debug);
         Predicate<TestEntry> predicate = filterOptions.createPredicate(stream);
         assertThat(predicate.test(ENTRY_A)).isFalse();
@@ -477,7 +477,7 @@ public class FilterOptionsTest {
     }
 
     @Test
-    public void createPredicate_multipleLevels() {
+    void createPredicate_multipleLevels() {
         filterOptions.level = List.of(LogLevel.info, LogLevel.trace);
         Predicate<TestEntry> predicate = filterOptions.createPredicate(stream);
         assertThat(predicate.test(ENTRY_A)).isTrue();
@@ -486,7 +486,7 @@ public class FilterOptionsTest {
     }
 
     @Test
-    public void createPredicate_excludeLevel() {
+    void createPredicate_excludeLevel() {
         filterOptions.excludeLevel = List.of(LogLevel.debug);
         Predicate<TestEntry> predicate = filterOptions.createPredicate(stream);
         assertThat(predicate.test(ENTRY_A)).isTrue();
@@ -495,7 +495,7 @@ public class FilterOptionsTest {
     }
 
     @Test
-    public void createPredicate_excludeMultipleLevels() {
+    void createPredicate_excludeMultipleLevels() {
         filterOptions.excludeLevel = List.of(LogLevel.info, LogLevel.trace);
         Predicate<TestEntry> predicate = filterOptions.createPredicate(stream);
         assertThat(predicate.test(ENTRY_A)).isFalse();
@@ -504,7 +504,7 @@ public class FilterOptionsTest {
     }
 
     @Test
-    public void createPredicate_includeSourceIncludeLevel() {
+    void createPredicate_includeSourceIncludeLevel() {
         filterOptions.device = List.of("deviceA", "deviceB");
         filterOptions.level = List.of(LogLevel.debug, LogLevel.trace);
         Predicate<TestEntry> predicate = filterOptions.createPredicate(stream);
@@ -514,7 +514,7 @@ public class FilterOptionsTest {
     }
 
     @Test
-    public void createPredicate_includeSourceExcludeLevel() {
+    void createPredicate_includeSourceExcludeLevel() {
         filterOptions.device = List.of("deviceA", "deviceB");
         filterOptions.excludeLevel = List.of(LogLevel.debug, LogLevel.trace);
         Predicate<TestEntry> predicate = filterOptions.createPredicate(stream);
@@ -524,7 +524,7 @@ public class FilterOptionsTest {
     }
 
     @Test
-    public void createPredicate_excludeSourceIncludeLevel() {
+    void createPredicate_excludeSourceIncludeLevel() {
         filterOptions.excludeDevice = List.of("deviceA", "deviceB");
         filterOptions.level = List.of(LogLevel.debug, LogLevel.trace);
         Predicate<TestEntry> predicate = filterOptions.createPredicate(stream);
@@ -534,7 +534,7 @@ public class FilterOptionsTest {
     }
 
     @Test
-    public void createPredicate_excludeSourceExcludeLevel() {
+    void createPredicate_excludeSourceExcludeLevel() {
         filterOptions.excludeDevice = List.of("deviceA");
         filterOptions.excludeLevel = List.of(LogLevel.trace);
         Predicate<TestEntry> predicate = filterOptions.createPredicate(stream);

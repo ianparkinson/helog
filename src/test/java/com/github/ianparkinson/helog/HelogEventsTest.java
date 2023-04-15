@@ -14,30 +14,30 @@ import static com.github.ianparkinson.helog.testing.TestStrings.dropDateTime;
 import static com.github.ianparkinson.helog.testing.TestStrings.splitLines;
 import static com.google.common.truth.Truth.assertThat;
 
-public final class HelogEventsTest {
+final class HelogEventsTest {
     @RegisterExtension
-    private final WebSocketServerExtension webServer = new WebSocketServerExtension();
+    final WebSocketServerExtension webServer = new WebSocketServerExtension();
     @RegisterExtension
-    private final StdOutExtension out = new StdOutExtension();
+    final StdOutExtension out = new StdOutExtension();
     @RegisterExtension
-    private final StdErrExtension err = new StdErrExtension();
+    final StdErrExtension err = new StdErrExtension();
 
     @Test
-    public void connectsToEventSocket() throws InterruptedException {
+    void connectsToEventSocket() throws InterruptedException {
         Helog.run("events", webServer.getHostAndPort());
         RecordedRequest request = webServer.takeRequest();
         assertThat(request.getPath()).isEqualTo("/eventsocket");
     }
 
     @Test
-    public void reportsConnection() {
+    void reportsConnection() {
         Helog.run("events", webServer.getHostAndPort());
         assertThat(splitLines(err.getContent()).get(0)).isEqualTo(
                 "Connected to ws://" + webServer.getHostAndPort() + "/eventsocket");
     }
 
     @Test
-    public void writesFormattedJson_device() {
+    void writesFormattedJson_device() {
         webServer.content.add("{ \"source\":\"DEVICE\",\"name\":\"switch\",\"displayName\" : \"Christmas Tree\", " +
                 "\"value\" : \"off\", \"type\" : \"digital\", \"unit\":\"null\",\"deviceId\":34,\"hubId\":0," +
                 "\"installedAppId\":0,\"descriptionText\" : \"null\"}");
@@ -49,7 +49,7 @@ public final class HelogEventsTest {
     }
 
     @Test
-    public void writesFormattedJson_app() {
+    void writesFormattedJson_app() {
         webServer.content.add("{ \"source\":\"APP\",\"name\":\"eventWithDescription\",\"displayName\" : \"null\", " +
                 "\"value\" : \"5\", \"type\" : \"null\", \"unit\":\"jiffy\",\"deviceId\":0,\"hubId\":0," +
                 "\"installedAppId\":93,\"descriptionText\" : \"This is an event\"}");
@@ -61,7 +61,7 @@ public final class HelogEventsTest {
     }
 
     @Test
-    public void filterIncludeDevice() {
+    void filterIncludeDevice() {
         webServer.content.add("{ \"source\":\"DEVICE\",\"name\":\"switch\",\"displayName\" : \"MatchByName\", " +
                 "\"value\" : \"off\", \"type\" : \"digital\", \"unit\":\"null\",\"deviceId\":34,\"hubId\":0," +
                 "\"installedAppId\":0,\"descriptionText\" : \"null\"}");
@@ -84,7 +84,7 @@ public final class HelogEventsTest {
     }
 
     @Test
-    public void filterExcludeDevice() {
+    void filterExcludeDevice() {
         webServer.content.add("{ \"source\":\"DEVICE\",\"name\":\"switch\",\"displayName\" : \"MatchByName\", " +
                 "\"value\" : \"off\", \"type\" : \"digital\", \"unit\":\"null\",\"deviceId\":34,\"hubId\":0," +
                 "\"installedAppId\":0,\"descriptionText\" : \"null\"}");
@@ -107,7 +107,7 @@ public final class HelogEventsTest {
     }
 
     @Test
-    public void filterIncludeApp() {
+    void filterIncludeApp() {
         webServer.content.add("{ \"source\":\"APP\",\"name\":\"FirstMatch\",\"displayName\" : \"\", " +
                 "\"value\" : \"off\", \"type\" : \"digital\", \"unit\":\"null\",\"deviceId\":0,\"hubId\":0," +
                 "\"installedAppId\":34,\"descriptionText\" : \"null\"}");
@@ -130,7 +130,7 @@ public final class HelogEventsTest {
     }
 
     @Test
-    public void filterExcludeApp() {
+    void filterExcludeApp() {
         webServer.content.add("{ \"source\":\"APP\",\"name\":\"FirstMatch\",\"displayName\" : \"\", " +
                 "\"value\" : \"off\", \"type\" : \"digital\", \"unit\":\"null\",\"deviceId\":0,\"hubId\":0," +
                 "\"installedAppId\":34,\"descriptionText\" : \"null\"}");
@@ -153,7 +153,7 @@ public final class HelogEventsTest {
     }
 
     @Test
-    public void filterIncludeName() {
+    void filterIncludeName() {
         webServer.content.add("{ \"source\":\"APP\",\"name\":\"Prop1\",\"displayName\" : \"\", " +
                 "\"value\" : \"off\", \"type\" : \"digital\", \"unit\":\"null\",\"deviceId\":0,\"hubId\":0," +
                 "\"installedAppId\":34,\"descriptionText\" : \"FirstMatch\"}");
@@ -173,7 +173,7 @@ public final class HelogEventsTest {
     }
 
     @Test
-    public void filterExcludeName() {
+    void filterExcludeName() {
         webServer.content.add("{ \"source\":\"APP\",\"name\":\"Prop1\",\"displayName\" : \"\", " +
                 "\"value\" : \"off\", \"type\" : \"digital\", \"unit\":\"null\",\"deviceId\":0,\"hubId\":0," +
                 "\"installedAppId\":34,\"descriptionText\" : \"FirstMatch\"}");
@@ -192,7 +192,7 @@ public final class HelogEventsTest {
     }
 
     @Test
-    public void writesInCsvFormat() {
+    void writesInCsvFormat() {
         webServer.content.add("{ \"source\":\"DEVICE\",\"name\":\"switch\",\"displayName\" : \"Christmas Tree\", " +
                 "\"value\" : \"off\", \"type\" : \"digital\", \"unit\":\"null\",\"deviceId\":34,\"hubId\":0," +
                 "\"installedAppId\":0,\"descriptionText\" : \"null\"}");
@@ -205,7 +205,7 @@ public final class HelogEventsTest {
     }
 
     @Test
-    public void toleratesMalformedJson() {
+    void toleratesMalformedJson() {
         webServer.content.add("unparseable");
         webServer.content.add("{ \"source\":\"DEVICE\",\"name\":\"switch\",\"displayName\" : \"Christmas Tree\", " +
                 "\"value\" : \"off\", \"type\" : \"digital\", \"unit\":\"null\",\"deviceId\":34,\"hubId\":0," +
@@ -222,7 +222,7 @@ public final class HelogEventsTest {
     }
 
     @Test
-    public void rawSpoolsExact() {
+    void rawSpoolsExact() {
         webServer.content.add("abcdef");
         Helog.run("events", webServer.getHostAndPort(), "--raw");
 
@@ -231,21 +231,21 @@ public final class HelogEventsTest {
     }
 
     @Test
-    public void rawAndCsvMutuallyExclusive() {
+    void rawAndCsvMutuallyExclusive() {
         int code = Helog.run("events", webServer.getHostAndPort(), "--raw", "--csv");
         assertThat(err.getContent()).startsWith(ERROR_PREFIX);
         assertThat(code).isEqualTo(2);
     }
 
     @Test
-    public void filterValidationFailureHandled() {
+    void filterValidationFailureHandled() {
         int code = Helog.run("log", webServer.getHostAndPort(), "--raw", "--device=42");
         assertThat(err.getContent()).startsWith(ERROR_PREFIX);
         assertThat(code).isEqualTo(2);
     }
 
     @Test
-    public void exitCode1() {
+    void exitCode1() {
         assertThat(Helog.run("events", webServer.getHostAndPort())).isEqualTo(1);
     }
 }

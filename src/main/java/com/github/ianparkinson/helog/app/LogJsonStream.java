@@ -86,7 +86,7 @@ public final class LogJsonStream implements JsonStream<LogJsonStream.LogEntry> {
      * <p>Sample content:
      * {@code {"name":"Christmas Tree","msg":"setSysinfo: [led:off]","id":34,"time":"2022-11-05 16:25:52.729","type":"dev","level":"info"}}
      */
-    public static class LogEntry {
+    public static final class LogEntry {
         public String name;
         public String msg;
         public String id;

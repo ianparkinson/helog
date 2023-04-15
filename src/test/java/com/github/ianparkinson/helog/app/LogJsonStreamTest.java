@@ -8,7 +8,7 @@ import java.time.ZonedDateTime;
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-class LogJsonStreamTest {
+final class LogJsonStreamTest {
 
     private static final String DATE_TIME_STRING = "2023-01-28T13:00:00.000Z";
     private static final ZonedDateTime DATE_TIME = ZonedDateTime.parse(DATE_TIME_STRING);
