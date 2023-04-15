@@ -29,6 +29,41 @@ final class StringsTest {
     }
 
     @Test
+    void emptyIfNullOrZero() {
+        assertThat(Strings.emptyIfNull("0")).isEqualTo("0");
+    }
+
+    @Test
+    void emptyIfNullOrZero_notEmpty() {
+        Truth.assertThat(Strings.emptyIfNullOrZero("not null")).isEqualTo("not null");
+    }
+
+    @Test
+    void emptyIfNullOrZero_null() {
+        assertThat(Strings.emptyIfNullOrZero(null)).isEmpty();
+    }
+
+    @Test
+    void emptyIfNullOrZero_literallyNull() {
+        assertThat(Strings.emptyIfNullOrZero("null")).isEmpty();
+    }
+
+    @Test
+    void emptyIfNullOrZero_caseInsensitive() {
+        assertThat(Strings.emptyIfNullOrZero("NULL")).isEmpty();
+    }
+
+    @Test
+    void emptyIfNullOrZero_zero() {
+        assertThat(Strings.emptyIfNullOrZero("0")).isEmpty();
+    }
+
+    @Test
+    void emptyIfNullOrZero_number() {
+        assertThat(Strings.emptyIfNullOrZero("1")).isEqualTo("1");
+    }
+
+    @Test
     void isHostPort_ipAddress() {
         assertThat(Strings.isHostPort("1.2.3.4")).isTrue();
     }

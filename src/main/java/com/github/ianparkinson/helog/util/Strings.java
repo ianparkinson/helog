@@ -17,6 +17,13 @@ public final class Strings {
     }
 
     /**
+     * Returns the input {@link String}, unless it is {@code null}, literally {@code "null"}, or literally {@code "0"}.
+     */
+    public static String emptyIfNullOrZero(String input) {
+        return (input == null || input.equalsIgnoreCase("null") || input.equals("0")) ? "" : input;
+    }
+
+    /**
      * Validates the {@code host} parameter, which is an IP address or hostname, with an optional port number seperated
      * by a colon. This isn't intended to be a strict test of whether the input string is a valid IP address or host
      * name it's just to prevent accidental use of entire URLs etc.

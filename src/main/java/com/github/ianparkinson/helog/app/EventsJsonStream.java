@@ -11,6 +11,7 @@ import java.util.stream.Stream;
 
 import static com.github.ianparkinson.helog.util.DateTimeFormatters.ISO_OFFSET_DATE_TIME_MILLIS;
 import static com.github.ianparkinson.helog.util.Strings.emptyIfNull;
+import static com.github.ianparkinson.helog.util.Strings.emptyIfNullOrZero;
 import static java.util.Arrays.asList;
 
 /**
@@ -70,11 +71,6 @@ public final class EventsJsonStream implements JsonStream<EventsJsonStream.Event
                 .filter(v -> !v.isEmpty())
                 .collect(Collectors.toList());
         return String.join(" ", prefixParts) + ": " + String.join(" ", suffixParts);
-    }
-
-    private static String emptyIfNullOrZero(String id) {
-        id = emptyIfNull(id);
-        return id.trim().equals("0") ? "" : id;
     }
 
     @Override
