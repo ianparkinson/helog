@@ -185,4 +185,12 @@ final class EventsJsonStreamTest {
                 DATE_TIME_STRING, "s", "n", "dn", "v", "t", "u", "1", "2", "3", "dt"
         ).inOrder();
     }
+
+    @Test
+    void csvFormatterToleratesNull() {
+        EventEntry entry = new EventEntry();
+        assertThat(eventsJsonStream.csvFormatter().format(DATE_TIME, entry)).containsExactly(
+                DATE_TIME_STRING, null, null, null, null, null, null, null, null, null, null
+        ).inOrder();
+    }
 }

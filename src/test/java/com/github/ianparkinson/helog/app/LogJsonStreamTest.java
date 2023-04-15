@@ -151,4 +151,11 @@ final class LogJsonStreamTest {
         assertThat(logJsonStream.csvFormatter().format(DATE_TIME, entry))
                 .containsExactly(DATE_TIME_STRING, "n", "m", "i", "ti", "ty", "l").inOrder();
     }
+
+    @Test
+    void csvFormatterToleratesNull() {
+        LogEntry entry = new LogEntry();
+        assertThat(logJsonStream.csvFormatter().format(DATE_TIME, entry))
+                .containsExactly(DATE_TIME_STRING, null, null, null, null, null, null).inOrder();
+    }
 }

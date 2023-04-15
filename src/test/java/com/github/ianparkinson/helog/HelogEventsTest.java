@@ -201,7 +201,7 @@ final class HelogEventsTest {
         assertThat(lines).hasSize(2);
         assertThat(lines.get(0)).isEqualTo(
                 "localTime,source,name,displayName,value,type,unit,deviceId,hubId,installedAppId,descriptionText");
-        assertThat(dropDateTime(lines.get(1))).isEqualTo(",DEVICE,switch,Christmas Tree,off,digital,,34,0,0,");
+        assertThat(dropDateTime(lines.get(1))).isEqualTo(",DEVICE,switch,Christmas Tree,off,digital,null,34,0,0,null");
     }
 
     @Test

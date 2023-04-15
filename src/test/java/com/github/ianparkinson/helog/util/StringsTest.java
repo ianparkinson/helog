@@ -3,6 +3,8 @@ package com.github.ianparkinson.helog.util;
 import com.google.common.truth.Truth;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static com.google.common.truth.Truth.assertThat;
@@ -126,6 +128,18 @@ final class StringsTest {
     @Test
     void csvLineTwoEntries() {
         assertThat(Strings.csvLine(List.of("hello", "world"))).isEqualTo("hello,world");
+    }
+
+    @Test
+    void csvLineOneNull() {
+        ArrayList<String> list = new ArrayList<>();
+        list.add(null);
+        assertThat(Strings.csvLine(list)).isEqualTo("");
+    }
+
+    @Test
+    void csvLineToleratesNulls() {
+        assertThat(Strings.csvLine(Arrays.asList("hello", null, "world"))).isEqualTo("hello,,world");
     }
 
     @Test

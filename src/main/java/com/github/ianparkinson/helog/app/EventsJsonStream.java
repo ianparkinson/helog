@@ -93,16 +93,16 @@ public final class EventsJsonStream implements JsonStream<EventsJsonStream.Event
     public JsonStreamFormatter<EventEntry, List<String>> csvFormatter() {
         return (zonedDateTime, entry) -> asList(
                 ISO_OFFSET_DATE_TIME_MILLIS.format(zonedDateTime),
-                emptyIfNull(entry.source),
-                emptyIfNull(entry.name),
-                emptyIfNull(entry.displayName),
-                emptyIfNull(entry.value),
-                emptyIfNull(entry.type),
-                emptyIfNull(entry.unit),
-                emptyIfNull(entry.deviceId),
-                emptyIfNull(entry.hubId),
-                emptyIfNull(entry.installedAppId),
-                emptyIfNull(entry.descriptionText));
+                entry.source,
+                entry.name,
+                entry.displayName,
+                entry.value,
+                entry.type,
+                entry.unit,
+                entry.deviceId,
+                entry.hubId,
+                entry.installedAppId,
+                entry.descriptionText);
     }
 
     /**

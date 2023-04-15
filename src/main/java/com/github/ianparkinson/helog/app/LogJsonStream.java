@@ -72,12 +72,12 @@ public final class LogJsonStream implements JsonStream<LogJsonStream.LogEntry> {
     public JsonStreamFormatter<LogEntry, List<String>> csvFormatter() {
         return (dateTime, entry) -> asList(
                 ISO_OFFSET_DATE_TIME_MILLIS.format(dateTime),
-                emptyIfNull(entry.name),
-                emptyIfNull(entry.msg),
-                emptyIfNull(entry.id),
-                emptyIfNull(entry.time),
-                emptyIfNull(entry.type),
-                emptyIfNull(entry.level));
+                entry.name,
+                entry.msg,
+                entry.id,
+                entry.time,
+                entry.type,
+                entry.level);
     }
 
     /**

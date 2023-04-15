@@ -59,7 +59,9 @@ public final class Strings {
     private static String csvEscapeValue(String value) {
         // Simplified implementation of CSV escaping. If the value contains any special characters (such as newlines,
         // commas), the whole string is encased in double-quotes. Existing double-quotes (") are doubled up ("").
-        if (csvSpecialChars.matcher(value).find()) {
+        if (value == null) {
+            return "";
+        } else if (csvSpecialChars.matcher(value).find()) {
             return '"' + doubleQuotes.matcher(value).replaceAll("\"\"") + '"';
         } else {
            return value;
